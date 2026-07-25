@@ -310,7 +310,6 @@
         </div>
         <div class="btn-group-header">
             <button class="btn-sm btn-warning" onclick="resetAllCounters()">🔄 Reset Klik</button>
-           
         </div>
     </div>
     <div id="groupsContainer"></div>
@@ -322,7 +321,7 @@
       <div class="game-header">
     <div class="game-header-left">
         <img class="game-header-avatar" id="gameHeaderAvatar" src="" onerror="this.style.display='none'">
-        <span id="gameTitle">🎮 Games</span>
+        <span id="gameTitle">🎮 Game</span>
     </div>
     <button class="close-game" onclick="closeGame()">✕ Close</button>
 </div>
@@ -543,31 +542,6 @@ function showToast(msg) {
     setTimeout(() => t.remove(), 2500); 
 }
 
-function showGameManager() {
-    let html = `<b>🗑️ KELOLA GAME</b><br><br>
-    <div style="font-size:11px; opacity:0.7; margin-bottom:12px;">Centang game yang TIDAK AKTIF (tidak akan ditampilkan)</div>
-    <button class="select-all-btn" onclick="selectAllGames()">✅ Pilih Semua</button>
-    <button class="select-all-btn" onclick="unselectAllGames()" style="background: rgba(231,76,60,0.5); margin-left:8px;">❌ Hapus Semua</button>
-    <div class="game-check-list" id="gameCheckList">`;
-    
-    const groupNames = { biru:"POLA 1", hijau:"POLA 2", oranye:"POLA 3", ungu:"POLA 4", hitam:"POLA 5" };
-    
-    for (let game of ALL_GAMES) {
-        let isChecked = inactiveGames.includes(game.n);
-        html += `<div class="game-check-item" onclick="toggleGameCheck('${game.n.replace(/'/g, "\\'")}')">
-            <input type="checkbox" id="check_${game.n.replace(/[^a-zA-Z0-9]/g, '_')}" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation(); toggleGameCheck('${game.n.replace(/'/g, "\\'")}')">
-            <label onclick="event.stopPropagation(); toggleGameCheck('${game.n.replace(/'/g, "\\'")}')">${game.n} <span class="game-group">(${groupNames[game.g]})</span></label>
-        </div>`;
-    }
-    
-    html += `</div>
-    <div style="display:flex; gap:10px; margin-top:12px;">
-        <button class="btn-sm" style="background:#2ecc71;" onclick="applyGameChanges()">💾 Simpan Perubahan</button>
-        <button class="btn-sm" onclick="closePopup()">Batal</button>
-    </div>`;
-    showPopup(html);
-}
-
 function toggleGameCheck(gameName) {
     let idx = inactiveGames.indexOf(gameName);
     if (idx === -1) {
@@ -721,4 +695,4 @@ loadData();
 renderGames();
 </script>
 </body>
-</html>
+    </html>
