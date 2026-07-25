@@ -1,4 +1,4 @@
- <iframe src="button.html"></iframe>
+<center><iframe src="button.html"></iframe></center>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
