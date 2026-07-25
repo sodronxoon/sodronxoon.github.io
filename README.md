@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <iframe src="button.html"></iframe
 <html lang="id">
 <head>
 <meta charset="UTF-8">
