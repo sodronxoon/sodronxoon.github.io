@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Button Frame Keren</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #050505;
+    font-family: Arial, sans-serif;
+    overflow: hidden;
+}
+
+/* BUTTON */
+.open-btn {
+    position: relative;
+    padding: 16px 40px;
+    border: 1px solid #00eaff;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #07151c, #001f29);
+    color: #00eaff;
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    cursor: pointer;
+    box-shadow:
+        0 0 10px #00eaff,
+        inset 0 0 15px rgba(0,234,255,.15);
+    transition: .3s;
+}
+
+.open-btn:hover {
+    transform: scale(1.08);
+    box-shadow:
+        0 0 20px #00eaff,
+        0 0 50px rgba(0,234,255,.5);
+}
+
+/* FRAME */
+.frame {
+    position: fixed;
+    width: min(90%, 600px);
+    min-height: 300px;
+    padding: 40px;
+    
+    background:
+        linear-gradient(145deg,
+        rgba(0,30,40,.96),
+        rgba(3,3,10,.98));
+    
+    border: 1px solid #00eaff;
+    border-radius: 20px;
+
+    box-shadow:
+        0 0 10px #00eaff,
+        0 0 40px rgba(0,234,255,.4),
+        inset 0 0 40px rgba(0,234,255,.08);
+
+    color: white;
+    text-align: center;
+
+    opacity: 0;
+    transform: scale(.5) rotateX(70deg);
+    pointer-events: none;
+
+    transition:
+        opacity .5s ease,
+        transform .7s cubic-bezier(.17,.67,.18,1.25);
+}
+
+/* SAAT AKTIF */
+.frame.active {
+    opacity: 1;
+    transform: scale(1) rotateX(0);
+    pointer-events: auto;
+}
+
+/* GARIS CAHAYA */
+.frame::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: 22px;
+    border: 2px solid transparent;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        #00eaff,
+        transparent
+    ) border-box;
+
+    mask:
+        linear-gradient(#000 0 0) padding-box,
+        linear-gradient(#000 0 0);
+
+    mask-composite: exclude;
+
+    animation: borderMove 2s linear infinite;
+}
+
+@keyframes borderMove {
+    0% {
+        filter: hue-rotate(0deg);
+        transform: rotate(0deg);
+    }
+
+    100% {
+        filter: hue-rotate(360deg);
+        transform: rotate(0deg);
+    }
+}
+
+/* ISI */
+.frame h1 {
+    margin-top: 0;
+    color: #00eaff;
+    font-size: 32px;
+    text-shadow:
+        0 0 10px #00eaff,
+        0 0 30px #00eaff;
+}
+
+.frame p {
+    color: #d9faff;
+    line-height: 1.7;
+}
+
+/* CLOSE */
+.close-btn {
+    margin-top: 20px;
+    padding: 10px 25px;
+    border: 1px solid #ff3b81;
+    border-radius: 8px;
+    background: transparent;
+    color: #ff3b81;
+    cursor: pointer;
+    font-weight: bold;
+    transition: .3s;
+}
+
+.close-btn:hover {
+    background: #ff3b81;
+    color: white;
+    box-shadow: 0 0 25px #ff3b81;
+}
+
+/* BACKDROP */
+.backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.75);
+    backdrop-filter: blur(8px);
+
+    opacity: 0;
+    pointer-events: none;
+    transition: .5s;
+}
+
+.backdrop.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+</style>
+</head>
+
+<body>
+
+<button class="open-btn" onclick="openFrame()">
+    OPEN
+</button>
+
+<div class="backdrop" id="backdrop"></div>
+
+<div class="frame" id="frame">
+
+    <h1>WELCOME</h1>
+
+    <p>
+        Frame berhasil dibuka ✨<br>
+        Kamu bisa memasukkan gambar, video,
+        tulisan, atau HTML lainnya di sini.
+    </p>
+
+    <button class="close-btn" onclick="closeFrame()">
+        CLOSE
+    </button>
+
+</div>
+
+<script>
+const frame = document.getElementById("frame");
+const backdrop = document.getElementById("backdrop");
+
+function openFrame() {
+    frame.classList.add("active");
+    backdrop.classList.add("active");
+}
+
+function closeFrame() {
+    frame.classList.remove("active");
+    backdrop.classList.remove("active");
+}
+
+/* Klik area luar untuk menutup */
+backdrop.addEventListener("click", closeFrame);
+</script>
+
+</body>
+</html>
