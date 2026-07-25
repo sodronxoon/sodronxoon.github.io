@@ -309,8 +309,9 @@
             <span id="nicknameDisplay">SodroN</span>
         </div>
         <div class="btn-group-header">
-            <button class="btn-sm btn-warning" onclick="resetAllCounters()">🔄 Reset Klik</button>
-        </div>
+    <button class="btn-sm" onclick="showCaraKonek()">🔗 Cara Konekan Akun</button>
+    <button class="btn-sm btn-warning" onclick="resetAllCounters()">🔄 Reset Klik</button>
+</div>
     </div>
     <div id="groupsContainer"></div>
 </div>
@@ -687,6 +688,37 @@ function showPopup(html) {
 function closePopup() { 
     document.getElementById("popup").classList.remove("active"); 
     document.getElementById("popupBg").classList.remove("active"); 
+}
+
+function showCaraKonek() {
+    let html = `
+        <h3 style="margin-bottom:15px;">🔗 CARA MENGKONEKAN AKUN XOON</h3>
+
+        <div style="
+            text-align:left;
+            background:rgba(255,255,255,0.05);
+            padding:15px;
+            border-radius:15px;
+            line-height:1.8;
+            font-size:13px;
+        ">
+            <b>1.</b> Klik <b>Avatar SodroN</b> di bagian atas aplikasi.<br><br>
+
+            <b>2.</b> Masukkan atau <b>Update Token</b> akun XOON Anda.<br><br>
+
+            <b>3.</b> Tekan tombol <b>💾 Simpan</b>.<br><br>
+
+            ✅ Akun XOON Anda sekarang sudah terhubung.
+        </div>
+
+        <button class="btn-sm"
+                onclick="closePopup()"
+                style="margin-top:18px;width:100%;background:#2ecc71;">
+            Mengerti
+        </button>
+    `;
+
+    showPopup(html);
 }
 
 // Inisialisasi
