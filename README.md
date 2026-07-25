@@ -1,58 +1,234 @@
-<center><iframe src="button.html"></iframe></center>
+<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>SODRON</title>
+<title>Button Frame SODRON</title>
 
 <style>
 * {
-    margin: 0;
-    padding: 0;
     box-sizing: border-box;
 }
 
-html,
-body {
+html, body {
+    margin: 0;
     width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: #fff;
+    min-height: 100%;
 }
 
 body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #050505;
     font-family: Arial, Helvetica, sans-serif;
+    overflow: hidden;
 }
 
 /* =========================================
-   LAYAR UTAMA
-   Total 15 detik:
-   0 - 2   = putih
-   2 - 14  = SODRON tampil
-   14 - 15 = menghilang
-   ========================================= */
+   BUTTON
+========================================= */
+
+.open-btn {
+    position: relative;
+    padding: 16px 40px;
+    border: 1px solid #00eaff;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #07151c, #001f29);
+    color: #00eaff;
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    cursor: pointer;
+
+    box-shadow:
+        0 0 10px #00eaff,
+        inset 0 0 15px rgba(0,234,255,.15);
+
+    transition: .3s;
+}
+
+.open-btn:hover {
+    transform: scale(1.08);
+
+    box-shadow:
+        0 0 20px #00eaff,
+        0 0 50px rgba(0,234,255,.5);
+}
+
+
+/* =========================================
+   BACKDROP
+========================================= */
+
+.backdrop {
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0,0,0,.8);
+    backdrop-filter: blur(8px);
+
+    opacity: 0;
+    pointer-events: none;
+
+    transition: .5s;
+
+    z-index: 10;
+}
+
+.backdrop.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+
+/* =========================================
+   FRAME
+========================================= */
+
+.frame {
+    position: fixed;
+
+    width: min(94vw, 900px);
+    height: min(80vh, 600px);
+
+    overflow: hidden;
+
+    background: #fff;
+
+    border: 1px solid #00eaff;
+    border-radius: 20px;
+
+    box-shadow:
+        0 0 10px #00eaff,
+        0 0 40px rgba(0,234,255,.4),
+        inset 0 0 40px rgba(0,234,255,.08);
+
+    opacity: 0;
+
+    transform:
+        scale(.5)
+        rotateX(70deg);
+
+    pointer-events: none;
+
+    transition:
+        opacity .5s ease,
+        transform .7s cubic-bezier(.17,.67,.18,1.25);
+
+    z-index: 20;
+}
+
+
+/* FRAME AKTIF */
+
+.frame.active {
+    opacity: 1;
+
+    transform:
+        scale(1)
+        rotateX(0);
+
+    pointer-events: auto;
+}
+
+
+/* GARIS FRAME */
+
+.frame::before {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    border: 2px solid transparent;
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            #00eaff,
+            transparent
+        ) border-box;
+
+    mask:
+        linear-gradient(#000 0 0) padding-box,
+        linear-gradient(#000 0 0);
+
+    mask-composite: exclude;
+
+    pointer-events: none;
+
+    z-index: 100;
+}
+
+
+/* =========================================
+   TOMBOL CLOSE
+========================================= */
+
+.close-btn {
+    position: absolute;
+
+    right: 15px;
+    top: 15px;
+
+    z-index: 200;
+
+    width: 42px;
+    height: 42px;
+
+    border: 1px solid #ff3b81;
+    border-radius: 50%;
+
+    background: rgba(0,0,0,.75);
+
+    color: #ff3b81;
+
+    font-size: 18px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: .3s;
+}
+
+.close-btn:hover {
+    background: #ff3b81;
+    color: white;
+
+    box-shadow:
+        0 0 25px #ff3b81;
+
+    transform: rotate(90deg);
+}
+
+
+/* =========================================
+   AREA SODRON
+========================================= */
 
 .scene {
     position: relative;
 
-    width: 100vw;
-    height: 100vh;
-    height: 100svh;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    width: 100%;
+    height: 100%;
 
     overflow: hidden;
 
     background: #fff;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 
 /* =========================================
    MY NAME IS
-   ========================================= */
+========================================= */
 
 .intro {
     position: absolute;
@@ -99,7 +275,7 @@ body {
 
 /* =========================================
    SODRON
-   ========================================= */
+========================================= */
 
 .name {
     position: absolute;
@@ -119,6 +295,8 @@ body {
 
 .name h1 {
     position: relative;
+
+    margin: 0;
 
     color: #080808;
 
@@ -147,7 +325,7 @@ body {
 
 /* =========================================
    CAHAYA MENYAPU SODRON
-   ========================================= */
+========================================= */
 
 .name h1::after {
     content: "SODRON";
@@ -183,7 +361,7 @@ body {
 
 /* =========================================
    SHOCKWAVE
-   ========================================= */
+========================================= */
 
 .wave {
     position: absolute;
@@ -213,9 +391,6 @@ body {
         infinite;
 }
 
-
-/* Lingkaran kedua */
-
 .wave::before {
     content: "";
 
@@ -238,7 +413,7 @@ body {
 
 /* =========================================
    PARTICLES
-   ========================================= */
+========================================= */
 
 .particles {
     position: absolute;
@@ -275,7 +450,7 @@ body {
 
 /* =========================================
    FLASH
-   ========================================= */
+========================================= */
 
 .flash {
     position: absolute;
@@ -300,7 +475,7 @@ body {
 
 /* =========================================
    VIGNETTE
-   ========================================= */
+========================================= */
 
 .vignette {
     position: absolute;
@@ -329,213 +504,150 @@ body {
 
 
 /* =========================================
-   ANIMASI MY NAME IS
-
-   0 - 13.3%  = 0 - 2 detik putih
-   13.3%       = mulai muncul
-   20%         = selesai masuk
-   86%         = mulai hilang
-   100%        = kembali putih
-   ========================================= */
+   INTRO ANIMATION
+========================================= */
 
 @keyframes introAnimation {
 
-    /* 0 detik */
     0% {
         opacity: 0;
-
-        transform:
-            translateY(30px);
-
+        transform: translateY(30px);
         filter: blur(20px);
     }
 
-    /* 2 detik */
     13.33% {
         opacity: 0;
-
-        transform:
-            translateY(30px);
-
+        transform: translateY(30px);
         filter: blur(20px);
     }
 
-    /* Masuk */
     17% {
         opacity: 1;
-
-        transform:
-            translateY(-80px);
-
+        transform: translateY(-80px);
         filter: blur(0);
     }
 
-    /* Tetap tampil selama 12 detik */
     20%,
     86% {
         opacity: 1;
-
-        transform:
-            translateY(-90px);
-
+        transform: translateY(-90px);
         filter: blur(0);
     }
 
-    /* Mulai hilang */
     93% {
         opacity: 0;
-
-        transform:
-            translateY(-125px);
-
+        transform: translateY(-125px);
         filter: blur(20px);
     }
 
-    /* Kembali putih */
     100% {
         opacity: 0;
-
-        transform:
-            translateY(-125px);
-
+        transform: translateY(-125px);
         filter: blur(20px);
     }
 }
 
 
 /* =========================================
-   ANIMASI SODRON
-   ========================================= */
+   SODRON ANIMATION
+========================================= */
 
 @keyframes sodronAnimation {
 
-    /* Layar putih */
     0% {
         opacity: 0;
-
         transform:
             scale(.15)
             rotateX(40deg);
-
         filter: blur(35px);
     }
 
-    /* 2 detik */
     13.33% {
         opacity: 0;
-
         transform:
             scale(.15)
             rotateX(40deg);
-
         filter: blur(35px);
     }
 
-    /* Muncul */
     17% {
         opacity: 1;
-
         transform:
             scale(1.18)
             rotateX(0deg);
-
         filter: blur(0);
     }
 
-    /* Sedikit bounce */
     19% {
-        transform:
-            scale(.96);
+        transform: scale(.96);
     }
 
     21% {
-        transform:
-            scale(1.03);
+        transform: scale(1.03);
     }
 
-    /* Tetap muncul */
     23%,
     86% {
         opacity: 1;
-
-        transform:
-            scale(1);
-
+        transform: scale(1);
         filter: blur(0);
     }
 
-    /* Menghilang */
     93% {
         opacity: 0;
-
-        transform:
-            scale(1.3);
-
+        transform: scale(1.3);
         filter: blur(25px);
     }
 
-    /* Reset */
     100% {
         opacity: 0;
-
-        transform:
-            scale(1.3);
-
+        transform: scale(1.3);
         filter: blur(25px);
     }
 }
 
 
 /* =========================================
-   CAHAYA BERGERAK
-   ========================================= */
+   SHINE
+========================================= */
 
 @keyframes shine {
 
     0% {
-        background-position:
-            150% 0;
+        background-position: 150% 0;
     }
 
     100% {
-        background-position:
-            -150% 0;
+        background-position: -150% 0;
     }
 }
 
 
 /* =========================================
-   SHOCKWAVE
-   ========================================= */
+   WAVE
+========================================= */
 
 @keyframes waveAnimation {
 
-    /* Putih 2 detik */
     0%,
     13.33% {
         width: 30px;
         height: 30px;
-
         opacity: 0;
     }
 
-    /* Ledakan */
     14% {
         width: 50px;
         height: 50px;
-
         opacity: .9;
     }
 
-    /* Membesar */
     25% {
         width: 160vw;
         height: 160vw;
-
         opacity: 0;
     }
 
-    /* Tetap hilang */
     100% {
         opacity: 0;
     }
@@ -547,19 +659,16 @@ body {
     0%,
     13.33% {
         transform: scale(.2);
-
         opacity: 0;
     }
 
     14% {
         transform: scale(1);
-
         opacity: .8;
     }
 
     25% {
         transform: scale(15);
-
         opacity: 0;
     }
 
@@ -570,12 +679,11 @@ body {
 
 
 /* =========================================
-   PARTICLE EXPLOSION
-   ========================================= */
+   PARTICLES
+========================================= */
 
 @keyframes particleAnimation {
 
-    /* Putih */
     0%,
     13.33% {
         opacity: 0;
@@ -585,7 +693,6 @@ body {
             scale(.2);
     }
 
-    /* Ledakan */
     14% {
         opacity: 1;
     }
@@ -594,7 +701,6 @@ body {
         opacity: .9;
     }
 
-    /* Menyebar */
     35% {
         opacity: 0;
 
@@ -614,7 +720,7 @@ body {
 
 /* =========================================
    FLASH
-   ========================================= */
+========================================= */
 
 @keyframes flashAnimation {
 
@@ -639,7 +745,7 @@ body {
 
 /* =========================================
    VIGNETTE
-   ========================================= */
+========================================= */
 
 @keyframes vignetteAnimation {
 
@@ -661,79 +767,100 @@ body {
 
 
 /* =========================================
-   RESPONSIVE HP
-   ========================================= */
+   RESPONSIVE
+========================================= */
 
 @media (max-width: 600px) {
 
+    .frame {
+        width: 96vw;
+        height: 75vh;
+        border-radius: 15px;
+    }
+
     .name h1 {
         font-size: 17vw;
-
         letter-spacing: 4px;
     }
 
     .intro span {
         font-size: 18px;
-
         letter-spacing: 7px;
-
         text-indent: 7px;
     }
 }
-
-
-/* =========================================
-   TABLET
-   ========================================= */
-
-@media (
-    min-width: 601px
-) and (
-    max-width: 1000px
-) {
-
-    .name h1 {
-        font-size: 14vw;
-    }
-}
-
 </style>
 </head>
 
-
 <body>
 
-<div class="scene">
+<!-- =========================================
+     BUTTON UTAMA
+========================================= -->
 
-    <!-- FLASH -->
-    <div class="flash"></div>
+<button class="open-btn" onclick="openFrame()">
+    OPEN
+</button>
 
 
-    <!-- MY NAME IS -->
-    <div class="intro">
-        <span>MY NAME IS</span>
+<!-- =========================================
+     BACKDROP
+========================================= -->
+
+<div
+    class="backdrop"
+    id="backdrop">
+</div>
+
+
+<!-- =========================================
+     FRAME
+========================================= -->
+
+<div
+    class="frame"
+    id="frame">
+
+    <!-- CLOSE -->
+
+    <button
+        class="close-btn"
+        onclick="closeFrame()">
+        ✕
+    </button>
+
+
+    <!-- =====================================
+         ISI FRAME
+    ====================================== -->
+
+    <div class="scene">
+
+        <div class="flash"></div>
+
+
+        <div class="intro">
+            <span>MY NAME IS</span>
+        </div>
+
+
+        <div class="name">
+            <h1>SODRON</h1>
+        </div>
+
+
+        <div class="wave"></div>
+
+
+        <div
+            class="particles"
+            id="particles">
+        </div>
+
+
+        <div class="vignette"></div>
+
     </div>
-
-
-    <!-- SODRON -->
-    <div class="name">
-        <h1>SODRON</h1>
-    </div>
-
-
-    <!-- SHOCKWAVE -->
-    <div class="wave"></div>
-
-
-    <!-- PARTICLES -->
-    <div
-        class="particles"
-        id="particles">
-    </div>
-
-
-    <!-- VIGNETTE -->
-    <div class="vignette"></div>
 
 </div>
 
@@ -741,8 +868,47 @@ body {
 <script>
 
 /* =========================================
-   MEMBUAT PARTIKEL
-   ========================================= */
+   FRAME CONTROL
+========================================= */
+
+const frame =
+    document.getElementById("frame");
+
+const backdrop =
+    document.getElementById("backdrop");
+
+
+function openFrame() {
+
+    frame.classList.add("active");
+
+    backdrop.classList.add("active");
+
+}
+
+
+function closeFrame() {
+
+    frame.classList.remove("active");
+
+    backdrop.classList.remove("active");
+
+}
+
+
+/* =========================================
+   KLIK LUAR FRAME = CLOSE
+========================================= */
+
+backdrop.addEventListener(
+    "click",
+    closeFrame
+);
+
+
+/* =========================================
+   PARTICLES
+========================================= */
 
 const particles =
     document.getElementById("particles");
@@ -757,15 +923,11 @@ for (let i = 0; i < 150; i++) {
         "particle";
 
 
-    /* Arah acak */
-
     const angle =
         Math.random() *
         Math.PI *
         2;
 
-
-    /* Jarak acak */
 
     const distance =
         150 +
@@ -788,13 +950,12 @@ for (let i = 0; i < 150; i++) {
         `${x}px`
     );
 
+
     particle.style.setProperty(
         "--y",
         `${y}px`
     );
 
-
-    /* Ukuran */
 
     const size =
         1 +
@@ -804,14 +965,10 @@ for (let i = 0; i < 150; i++) {
     particle.style.width =
         size + "px";
 
+
     particle.style.height =
         size + "px";
 
-
-    /*
-       Delay sangat kecil
-       agar ledakan terasa natural
-    */
 
     particle.style.animationDelay =
         (Math.random() * .15) + "s";
