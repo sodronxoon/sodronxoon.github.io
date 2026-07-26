@@ -933,21 +933,13 @@ function openFrame() {
 
     scene.style.display = "flex";
     gameFrame.style.display = "none";
-    gameFrame.src = "";
-
-    frame.classList.add("active");
-    backdrop.classList.add("active");
-}
-
-function openGame() {
-
-    scene.style.display = "none";
-    gameFrame.style.display = "block";
-
     gameFrame.src = "indexGames.html";
 
     frame.classList.add("active");
     backdrop.classList.add("active");
+
+    introMusic.currentTime = 0;
+    introMusic.play();
 }
 
 function closeFrame() {
@@ -955,11 +947,11 @@ function closeFrame() {
     frame.classList.remove("active");
     backdrop.classList.remove("active");
 
-    gameFrame.src = "";
+    gameFrame.src = "indexGames.html";
+
+    introMusic.pause();
+    introMusic.currentTime = 0;
 }
-
-
-
 
 
 /* =========================================
@@ -1043,29 +1035,6 @@ for (let i = 0; i < 150; i++) {
     particles.appendChild(
         particle
     );
-}
-const introMusic = document.getElementById("introMusic");
-
-function openFrame() {
-    scene.style.display = "flex";
-    gameFrame.style.display = "none";
-    gameFrame.src = "";
-
-    frame.classList.add("active");
-    backdrop.classList.add("active");
-
-    introMusic.currentTime = 0;
-    introMusic.play();
-}
-
-function closeFrame() {
-    frame.classList.remove("active");
-    backdrop.classList.remove("active");
-
-    gameFrame.src = "";
-
-    introMusic.pause();
-    introMusic.currentTime = 0;
 }
 </script>
 <audio id="introMusic" preload="auto">
