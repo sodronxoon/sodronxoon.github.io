@@ -841,7 +841,9 @@ body {
 }
 </style>
 </head>
-
+<audio id="introMusic" preload="auto">
+    <source src="musik.mp3" type="audio/mpeg">
+</audio>
 <body>
 
 <!-- =========================================
@@ -944,7 +946,7 @@ function openGame() {
     scene.style.display = "none";
     gameFrame.style.display = "block";
 
-    gameFrame.src = "indexGames.html";
+    gameFrame.src = "https://xexmxsdrnx.github.io";
 
     frame.classList.add("active");
     backdrop.classList.add("active");
@@ -1045,7 +1047,32 @@ for (let i = 0; i < 150; i++) {
     );
 }
 
+
+const introMusic = document.getElementById("introMusic");
+
+function openFrame() {
+    scene.style.display = "flex";
+    gameFrame.style.display = "none";
+    gameFrame.src = "";
+
+    frame.classList.add("active");
+    backdrop.classList.add("active");
+
+    introMusic.currentTime = 0;
+    introMusic.play();
+}
+
+function closeFrame() {
+    frame.classList.remove("active");
+    backdrop.classList.remove("active");
+
+    gameFrame.src = "";
+
+    introMusic.pause();
+    introMusic.currentTime = 0;
+}
+
 </script>
 
 </body>
-    </html>
+</html>
