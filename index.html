@@ -928,8 +928,11 @@ const backdrop = document.getElementById("backdrop");
 const scene = document.getElementById("scene");
 const gameFrame = document.getElementById("gameFrame");
 
-function openFrame() {
+// Audio element
+const introMusic = new Audio('musik.mp3');
+introMusic.preload = 'auto';
 
+function openFrame() {
     scene.style.display = "flex";
     gameFrame.style.display = "none";
     gameFrame.src = "";
@@ -937,22 +940,12 @@ function openFrame() {
     frame.classList.add("active");
     backdrop.classList.add("active");
 
+    // Reset dan mainkan musik
     introMusic.currentTime = 0;
-    introMusic.play();
-    }
-function closeFrame() {
+    introMusic.play().catch(e => console.log('Audio play error:', e));
+}
 
-    frame.classList.remove("active");
-    backdrop.classList.remove("active");
-
-    gameFrame.src = "";
-
-    introMusic.pause();
-    introMusic.currentTime = 0;
-    }
-    
 function openGame() {
-
     scene.style.display = "none";
     gameFrame.style.display = "block";
 
@@ -960,18 +953,24 @@ function openGame() {
 
     frame.classList.add("active");
     backdrop.classList.add("active");
+
+    // Hentikan musik saat game dibuka
+    introMusic.pause();
+    introMusic.currentTime = 0;
 }
 
 function closeFrame() {
-
     frame.classList.remove("active");
     backdrop.classList.remove("active");
 
     gameFrame.src = "";
+    gameFrame.style.display = "none";
+    scene.style.display = "flex";
+
+    // Hentikan musik
+    introMusic.pause();
+    introMusic.currentTime = 0;
 }
-
-
-
 
 
 /* =========================================
@@ -1057,9 +1056,14 @@ for (let i = 0; i < 150; i++) {
     );
 }
 
+// Keyboard shortcut untuk close dengan ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeFrame();
+    }
+});
+
 </script>
-<audio id="introMusic" preload="auto">
-    <source src="musik.mp3" type="audio/mpeg">
-</audio>
+
 </body>
-</html>
+    </html>
