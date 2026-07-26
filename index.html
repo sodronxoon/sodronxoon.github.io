@@ -839,43 +839,6 @@ body {
         text-indent: 7px;
     }
 }
-
-/* =========================================
-   NOTIFIKASI FILE TIDAK DITEMUKAN
-========================================= */
-
-.file-notif {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(255, 59, 129, 0.9);
-    color: white;
-    padding: 12px 24px;
-    border-radius: 10px;
-    font-size: 14px;
-    z-index: 999;
-    display: none;
-    text-align: center;
-    max-width: 90%;
-    box-shadow: 0 0 20px rgba(255, 59, 129, 0.3);
-}
-
-.file-notif.show {
-    display: block;
-    animation: slideUp 0.5s ease;
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateX(-50%) translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(-50%) translateY(0);
-    }
-}
 </style>
 </head>
 <body>
@@ -886,36 +849,16 @@ body {
 
 <div class="buttons">
 
-    <button
-        class="open-btn"
-        onclick="openFrame()">
-        OPEN
-    </button>
-
-    <button
-        class="game-btn"
-        onclick="openGame()">
-        GAMES
-    </button>
+    <button class="open-btn" onclick="openFrame()">OPEN</button>
+    <button class="game-btn" onclick="openGame()">GAMES</button>
 
 </div>
-
-<!-- =========================================
-     NOTIFIKASI FILE
-========================================= -->
-
-<div class="file-notif" id="fileNotif"></div>
-
 
 <!-- =========================================
      BACKDROP
 ========================================= -->
 
-<div
-    class="backdrop"
-    id="backdrop">
-</div>
-
+<div class="backdrop" id="backdrop"></div>
 
 <!-- =========================================
      FRAME SODRON
@@ -928,293 +871,105 @@ body {
     <div class="scene" id="scene">
 
         <div class="flash"></div>
-
-        <div class="intro">
-            <span>MY NAME IS</span>
-        </div>
-
-        <div class="name">
-            <h1>SODRON</h1>
-        </div>
-
+        <div class="intro"><span>MY NAME IS</span></div>
+        <div class="name"><h1>SODRON</h1></div>
         <div class="wave"></div>
-
         <div class="particles" id="particles"></div>
-
         <div class="vignette"></div>
 
     </div>
 
-    <iframe
-        id="gameFrame"
-        src=""
-        style="
-            display:none;
-            width:100%;
-            height:100%;
-            border:none;
-            background:#000;
-        ">
-    </iframe>
+    <iframe id="gameFrame" src="" style="display:none; width:100%; height:100%; border:none; background:#000;"></iframe>
 
 </div>
 
 <!-- =========================================
-     AUDIO - PASTIKAN FILE musik.mp3 ADA!
+     AUDIO
 ========================================= -->
-<audio id="introMusic" preload="auto" loop>
+
+<audio id="introMusic" loop>
     <source src="musik.mp3" type="audio/mpeg">
-    <!-- Fallback jika musik.mp3 tidak ditemukan -->
-    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
 </audio>
 
 <script>
-
-/* =========================================
-   FRAME CONTROL
-========================================= */
 
 const frame = document.getElementById("frame");
 const backdrop = document.getElementById("backdrop");
 const scene = document.getElementById("scene");
 const gameFrame = document.getElementById("gameFrame");
 const introMusic = document.getElementById("introMusic");
-const fileNotif = document.getElementById("fileNotif");
-
-// Set volume
-introMusic.volume = 0.7;
 
 function openFrame() {
     scene.style.display = "flex";
     gameFrame.style.display = "none";
     gameFrame.src = "";
-
     frame.classList.add("active");
     backdrop.classList.add("active");
-
-    // Play music
-    playMusic();
+    
+    // Putar musik
+    introMusic.currentTime = 0;
+    introMusic.play().catch(() => {});
 }
 
 function openGame() {
     scene.style.display = "none";
     gameFrame.style.display = "block";
-
-    // Coba load indexGames.html
     gameFrame.src = "indexGames.html";
-    
-    // Cek apakah game berhasil dimuat
-    gameFrame.onload = function() {
-        console.log('Game loaded successfully');
-        hideNotification();
-    };
-    
-    gameFrame.onerror = function() {
-        showNotification('⚠️ File indexGames.html tidak ditemukan! Buat file tersebut atau periksa nama filenya.');
-    };
-
     frame.classList.add("active");
     backdrop.classList.add("active");
-
-    // Stop music when game opens
-    stopMusic();
+    
+    // Hentikan musik
+    introMusic.pause();
+    introMusic.currentTime = 0;
 }
 
 function closeFrame() {
     frame.classList.remove("active");
     backdrop.classList.remove("active");
-
     gameFrame.src = "";
     gameFrame.style.display = "none";
     scene.style.display = "flex";
-
-    // Stop music
-    stopMusic();
-    hideNotification();
-}
-
-/* =========================================
-   MUSIC CONTROL
-========================================= */
-
-function playMusic() {
-    // Reset audio to beginning
-    introMusic.currentTime = 0;
     
-    // Try to play with error handling
-    const playPromise = introMusic.play();
-    
-    if (playPromise !== undefined) {
-        playPromise.then(() => {
-            console.log('🎵 Music playing successfully');
-            hideNotification();
-        }).catch(error => {
-            console.log('Audio play error:', error);
-            
-            // Cek apakah file audio ada
-            checkAudioFile();
-            
-            // Fallback: play on user interaction
-            document.addEventListener('click', function playOnClick() {
-                introMusic.play().catch(e => {
-                    console.log('Still failed:', e);
-                    showNotification('⚠️ Gagal memutar musik. Pastikan file musik.mp3 ada di folder yang sama.');
-                });
-                document.removeEventListener('click', playOnClick);
-            }, { once: true });
-        });
-    }
-}
-
-function stopMusic() {
+    // Hentikan musik
     introMusic.pause();
     introMusic.currentTime = 0;
 }
 
-// Cek apakah file audio bisa di-load
-function checkAudioFile() {
-    // Coba fetch file untuk cek keberadaan
-    fetch('musik.mp3')
-        .then(response => {
-            if (!response.ok) {
-                showNotification('⚠️ File musik.mp3 tidak ditemukan! Pastikan file ada di folder yang sama.');
-            } else {
-                console.log('✅ File musik.mp3 ditemukan');
-            }
-        })
-        .catch(() => {
-            showNotification('⚠️ File musik.mp3 tidak ditemukan! Pastikan file ada di folder yang sama.');
-        });
-}
+// Tutup frame jika klik backdrop
+backdrop.addEventListener("click", closeFrame);
 
-/* =========================================
-   NOTIFICATION
-========================================= */
-
-function showNotification(message) {
-    fileNotif.textContent = message;
-    fileNotif.classList.add('show');
-    
-    // Auto hide after 8 seconds
-    setTimeout(() => {
-        hideNotification();
-    }, 8000);
-}
-
-function hideNotification() {
-    fileNotif.classList.remove('show');
-}
-
-// Preload audio when page loads
-window.addEventListener('load', function() {
-    // Load audio
-    introMusic.load();
-    console.log('📁 Audio loaded');
-    console.log('📁 Pastikan file berikut ada di folder yang sama:');
-    console.log('   - musik.mp3 (untuk musik)');
-    console.log('   - indexGames.html (untuk game)');
-    
-    // Cek file audio
-    setTimeout(checkAudioFile, 1000);
+// Tutup dengan ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeFrame();
 });
 
-// Handle audio errors
-introMusic.addEventListener('error', function(e) {
-    console.log('Audio error:', e);
-    showNotification('⚠️ Error memutar musik. Pastikan file musik.mp3 valid.');
-});
+// =========================================
+// PARTICLES
+// =========================================
 
-/* =========================================
-   KLIK LUAR FRAME = CLOSE
-========================================= */
-
-backdrop.addEventListener(
-    "click",
-    closeFrame
-);
-
-
-/* =========================================
-   PARTICLES
-========================================= */
-
-const particles =
-    document.getElementById("particles");
-
+const particles = document.getElementById("particles");
 
 for (let i = 0; i < 150; i++) {
-
-    const particle =
-        document.createElement("div");
-
-    particle.className =
-        "particle";
-
-
-    const angle =
-        Math.random() *
-        Math.PI *
-        2;
-
-
-    const distance =
-        150 +
-        Math.random() *
-        700;
-
-
-    const x =
-        Math.cos(angle) *
-        distance;
-
-
-    const y =
-        Math.sin(angle) *
-        distance;
-
-
-    particle.style.setProperty(
-        "--x",
-        `${x}px`
-    );
-
-
-    particle.style.setProperty(
-        "--y",
-        `${y}px`
-    );
-
-
-    const size =
-        1 +
-        Math.random() * 5;
-
-
-    particle.style.width =
-        size + "px";
-
-
-    particle.style.height =
-        size + "px";
-
-
-    particle.style.animationDelay =
-        (Math.random() * .15) + "s";
-
-
-    particles.appendChild(
-        particle
-    );
+    const particle = document.createElement("div");
+    particle.className = "particle";
+    
+    const angle = Math.random() * Math.PI * 2;
+    const distance = 150 + Math.random() * 700;
+    const x = Math.cos(angle) * distance;
+    const y = Math.sin(angle) * distance;
+    
+    particle.style.setProperty("--x", `${x}px`);
+    particle.style.setProperty("--y", `${y}px`);
+    
+    const size = 1 + Math.random() * 5;
+    particle.style.width = size + "px";
+    particle.style.height = size + "px";
+    particle.style.animationDelay = (Math.random() * .15) + "s";
+    
+    particles.appendChild(particle);
 }
-
-// Keyboard shortcut untuk close dengan ESC
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        closeFrame();
-    }
-});
 
 </script>
 
 </body>
-</html>
+        </html>
