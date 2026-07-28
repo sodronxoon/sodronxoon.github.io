@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SODRON.XOON</title>
+    <title>SODRON • Visualizer</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
         * {
@@ -17,57 +17,110 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background: #070b0f;
-            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: #05080c;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
             overflow: hidden;
             padding: 16px;
         }
 
-        /* === Background minimal === */
-        .bg {
+        /* ===== CANVAS VISUALIZER ===== */
+        #visualizerCanvas {
             position: fixed;
             inset: 0;
+            width: 100%;
+            height: 100%;
             z-index: 0;
-            background: radial-gradient(ellipse at 30% 40%, #0d1f2c, #04080b);
-        }
-        .bg::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at 70% 80%, rgba(0, 180, 255, 0.04), transparent 60%);
+            display: block;
         }
 
-        /* === BUTTONS === */
-        .buttons {
+        /* ===== OVERLAY ===== */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .overlay>* {
+            pointer-events: auto;
+        }
+
+        /* ===== TEKS SODRON ===== */
+        .brand {
+            text-align: center;
+            margin-bottom: 10px;
+            animation: pulseGlow 3s ease-in-out infinite alternate;
+        }
+
+        .brand h1 {
+            font-size: clamp(52px, 14vw, 150px);
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: clamp(4px, 2vw, 16px);
+            text-shadow:
+                0 0 30px rgba(0, 240, 255, 0.3),
+                0 0 60px rgba(255, 45, 120, 0.2),
+                0 0 100px rgba(168, 85, 247, 0.1);
+            background: linear-gradient(180deg, #ffffff 40%, #8ac4ff 70%, #ff2d78 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             position: relative;
-            z-index: 5;
+        }
+
+        .brand .sub {
+            color: rgba(255, 255, 255, 0.35);
+            font-size: clamp(10px, 1.2vw, 16px);
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            font-weight: 200;
+            margin-top: -6px;
+        }
+
+        @keyframes pulseGlow {
+            0% {
+                filter: brightness(0.9);
+            }
+            100% {
+                filter: brightness(1.3);
+            }
+        }
+
+        /* ===== TOMBOL ===== */
+        .buttons {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 18px;
+            gap: 14px;
             width: 100%;
-            max-width: 320px;
+            max-width: 300px;
+            margin-top: 8px;
         }
 
         .btn {
             width: 100%;
-            padding: 16px 20px;
+            padding: 14px 20px;
             border: none;
             border-radius: 50px;
-            font-size: 17px;
+            font-size: 15px;
             font-weight: 600;
             letter-spacing: 3px;
             text-transform: uppercase;
             cursor: pointer;
-            transition: all 0.25s ease;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.04);
             color: #fff;
-            backdrop-filter: blur(6px);
-            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             position: relative;
             overflow: hidden;
         }
@@ -78,17 +131,16 @@
             inset: 0;
             border-radius: 50px;
             padding: 1.5px;
-            background: linear-gradient(135deg, rgba(0, 234, 255, 0.3), rgba(255, 59, 129, 0.2));
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.3), rgba(255, 45, 120, 0.2));
             -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
             mask-composite: exclude;
             -webkit-mask-composite: xor;
             pointer-events: none;
-            transition: 0.4s;
         }
 
         .btn:hover {
             transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
         }
         .btn:active {
             transform: scale(0.97);
@@ -96,43 +148,60 @@
 
         .btn-open {
             color: #aaffff;
-            text-shadow: 0 0 20px rgba(0, 234, 255, 0.15);
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
         }
         .btn-open:hover {
-            background: rgba(0, 234, 255, 0.06);
-            box-shadow: 0 0 30px rgba(0, 234, 255, 0.08), 0 8px 30px rgba(0, 0, 0, 0.4);
+            background: rgba(0, 240, 255, 0.06);
+            border-color: rgba(0, 240, 255, 0.15);
         }
         .btn-open i {
-            color: #00eaff;
-            font-size: 18px;
+            color: #00f0ff;
+            font-size: 16px;
         }
 
         .btn-game {
             color: #ffb3cc;
-            text-shadow: 0 0 20px rgba(255, 59, 129, 0.12);
+            text-shadow: 0 0 20px rgba(255, 45, 120, 0.12);
         }
         .btn-game:hover {
-            background: rgba(255, 59, 129, 0.05);
-            box-shadow: 0 0 30px rgba(255, 59, 129, 0.06), 0 8px 30px rgba(0, 0, 0, 0.4);
+            background: rgba(255, 45, 120, 0.06);
+            border-color: rgba(255, 45, 120, 0.15);
         }
         .btn-game i {
-            color: #ff3b81;
-            font-size: 18px;
+            color: #ff2d78;
+            font-size: 16px;
         }
 
         .divider {
-            width: 40px;
+            width: 30px;
             height: 1px;
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
         }
 
-        /* === BACKDROP === */
+        /* ===== EQUALIZER MINI ===== */
+        .equalizer {
+            display: flex;
+            gap: 3px;
+            height: 20px;
+            align-items: flex-end;
+            margin-top: 6px;
+            opacity: 0.4;
+        }
+        .equalizer .bar {
+            width: 4px;
+            background: linear-gradient(180deg, #00f0ff, #ff2d78);
+            border-radius: 2px;
+            transition: height 0.08s ease;
+            height: 4px;
+        }
+
+        /* ===== BACKDROP & FRAME ===== */
         .backdrop {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.65);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.45s ease;
@@ -143,7 +212,6 @@
             pointer-events: auto;
         }
 
-        /* === FRAME === */
         .frame {
             position: fixed;
             width: min(94vw, 920px);
@@ -151,7 +219,7 @@
             overflow: hidden;
             background: #0c121a;
             border-radius: 28px;
-            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.04);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.04);
             opacity: 0;
             transform: scale(0.85) translateY(20px);
             pointer-events: none;
@@ -164,7 +232,6 @@
             pointer-events: auto;
         }
 
-        /* === CLOSE === */
         .close-btn {
             position: absolute;
             right: 18px;
@@ -183,16 +250,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 0 1px rgba(255, 59, 129, 0.1);
+            border: 1px solid rgba(255, 45, 120, 0.1);
         }
         .close-btn:hover {
-            background: #ff3b81;
+            background: #ff2d78;
             color: #fff;
-            box-shadow: 0 0 25px rgba(255, 59, 129, 0.3);
+            box-shadow: 0 0 30px rgba(255, 45, 120, 0.3);
             transform: rotate(90deg);
         }
 
-        /* === SCENE === */
         .scene {
             position: absolute;
             inset: 0;
@@ -207,304 +273,10 @@
             z-index: 1;
         }
 
-        /* subtle glow */
-        .scene-glow {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(ellipse at 40% 50%, rgba(0, 180, 255, 0.04), transparent 70%);
-            z-index: 0;
+        .scene .brand h1 {
+            font-size: clamp(48px, 12vw, 140px);
         }
 
-        /* intro text */
-        .intro {
-            position: relative;
-            z-index: 10;
-            text-align: center;
-            opacity: 0;
-            animation: fadeIntro 14s ease-in-out infinite;
-        }
-        .intro span {
-            display: block;
-            color: #8ab8d9;
-            font-size: clamp(14px, 2.8vw, 32px);
-            font-weight: 300;
-            letter-spacing: clamp(6px, 2vw, 18px);
-            text-transform: uppercase;
-        }
-        .intro .sub {
-            font-size: clamp(10px, 1vw, 14px);
-            letter-spacing: 4px;
-            color: #4a6a80;
-            margin-top: 6px;
-            font-weight: 200;
-        }
-
-        /* name */
-        .name {
-            position: relative;
-            z-index: 9;
-            text-align: center;
-            opacity: 0;
-            animation: namePop 14s cubic-bezier(0.16, 1, 0.3, 1) infinite;
-            margin-top: -6px;
-        }
-        .name h1 {
-            position: relative;
-            margin: 0;
-            color: #eef7ff;
-            font-size: clamp(60px, 16vw, 180px);
-            font-weight: 900;
-            line-height: 0.92;
-            letter-spacing: clamp(1px, 0.8vw, 10px);
-            text-shadow: 0 0 40px rgba(0, 150, 255, 0.08);
-        }
-        .name h1::after {
-            content: 'SODRON';
-            position: absolute;
-            inset: 0;
-            color: transparent;
-            background: linear-gradient(110deg, transparent 20%, rgba(255, 255, 255, 0.2) 35%, #fff 48%, rgba(255, 255, 255, 0.2) 62%, transparent 80%);
-            background-size: 280% 100%;
-            background-clip: text;
-            -webkit-background-clip: text;
-            animation: shine 2.8s linear infinite;
-        }
-        @keyframes shine {
-            0% {
-                background-position: 200% 0;
-            }
-            100% {
-                background-position: -200% 0;
-            }
-        }
-
-        /* wave ring (lebih halus) */
-        .wave-ring {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            width: 30px;
-            height: 30px;
-            border: 1.5px solid rgba(0, 234, 255, 0.08);
-            border-radius: 50%;
-            z-index: 4;
-            opacity: 0;
-            animation: waveRing 14s ease-out infinite;
-        }
-        .wave-ring::before {
-            content: '';
-            position: absolute;
-            inset: -6px;
-            border: 1.5px solid rgba(255, 59, 129, 0.05);
-            border-radius: 50%;
-            animation: innerRing 14s ease-out infinite;
-        }
-        @keyframes waveRing {
-            0%,
-            10% {
-                opacity: 0;
-                width: 20px;
-                height: 20px;
-            }
-            13% {
-                opacity: 0.7;
-                width: 50px;
-                height: 50px;
-            }
-            28% {
-                opacity: 0;
-                width: 140vmax;
-                height: 140vmax;
-            }
-            100% {
-                opacity: 0;
-            }
-        }
-        @keyframes innerRing {
-            0%,
-            10% {
-                transform: scale(0.2);
-                opacity: 0;
-            }
-            13% {
-                transform: scale(1);
-                opacity: 0.6;
-            }
-            28% {
-                transform: scale(12);
-                opacity: 0;
-            }
-            100% {
-                opacity: 0;
-            }
-        }
-
-        /* particles (lebih sedikit & ringan) */
-        .particles {
-            position: absolute;
-            inset: 0;
-            z-index: 5;
-            pointer-events: none;
-        }
-        .particle {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            border-radius: 50%;
-            background: #8ac4ff;
-            opacity: 0;
-            animation: particleFly 14s cubic-bezier(0.1, 0.8, 0.2, 1) infinite;
-            will-change: transform, opacity;
-        }
-        @keyframes particleFly {
-            0%,
-            10% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0.2);
-            }
-            13% {
-                opacity: 0.9;
-            }
-            20% {
-                opacity: 0.7;
-            }
-            38% {
-                opacity: 0;
-                transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) scale(0);
-            }
-            100% {
-                opacity: 0;
-            }
-        }
-
-        /* flash (lebih subtle) */
-        .flash {
-            position: absolute;
-            inset: 0;
-            z-index: 20;
-            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.6), transparent 70%);
-            opacity: 0;
-            pointer-events: none;
-            animation: flashPop 14s ease-out infinite;
-        }
-        @keyframes flashPop {
-            0%,
-            10% {
-                opacity: 0;
-            }
-            13% {
-                opacity: 0.25;
-            }
-            15.5% {
-                opacity: 0;
-            }
-            100% {
-                opacity: 0;
-            }
-        }
-
-        /* vignette */
-        .vignette {
-            position: absolute;
-            inset: 0;
-            z-index: 15;
-            pointer-events: none;
-            background: radial-gradient(ellipse at center, transparent 35%, rgba(0, 0, 0, 0.3) 100%);
-            opacity: 0;
-            animation: vignetteIn 14s ease-in-out infinite;
-        }
-        @keyframes vignetteIn {
-            0%,
-            10% {
-                opacity: 0;
-            }
-            16%,
-            82% {
-                opacity: 1;
-            }
-            90%,
-            100% {
-                opacity: 0;
-            }
-        }
-
-        /* animasi intro & name */
-        @keyframes fadeIntro {
-            0% {
-                opacity: 0;
-                transform: translateY(20px);
-                filter: blur(8px);
-            }
-            10% {
-                opacity: 0;
-                transform: translateY(20px);
-                filter: blur(8px);
-            }
-            14% {
-                opacity: 1;
-                transform: translateY(-4px);
-                filter: blur(0);
-            }
-            18%,
-            82% {
-                opacity: 1;
-                transform: translateY(-6px);
-                filter: blur(0);
-            }
-            90% {
-                opacity: 0;
-                transform: translateY(-30px);
-                filter: blur(10px);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(-30px);
-                filter: blur(10px);
-            }
-        }
-        @keyframes namePop {
-            0% {
-                opacity: 0;
-                transform: scale(0.3) rotateX(20deg);
-                filter: blur(20px);
-            }
-            10% {
-                opacity: 0;
-                transform: scale(0.3) rotateX(20deg);
-                filter: blur(20px);
-            }
-            14% {
-                opacity: 1;
-                transform: scale(1.15);
-                filter: blur(0);
-            }
-            16% {
-                transform: scale(0.96);
-            }
-            18% {
-                transform: scale(1.02);
-            }
-            20%,
-            82% {
-                opacity: 1;
-                transform: scale(1);
-                filter: blur(0);
-            }
-            90% {
-                opacity: 0;
-                transform: scale(1.2);
-                filter: blur(18px);
-            }
-            100% {
-                opacity: 0;
-                transform: scale(1.2);
-                filter: blur(18px);
-            }
-        }
-
-        /* === IFRAME GAME === */
         #gameFrame {
             position: absolute;
             inset: 0;
@@ -516,7 +288,7 @@
             display: none;
         }
 
-        /* === RESPONSIVE === */
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 640px) {
             .frame {
                 width: 96vw;
@@ -524,16 +296,12 @@
                 border-radius: 20px;
             }
             .btn {
-                padding: 14px 16px;
-                font-size: 15px;
+                padding: 12px 16px;
+                font-size: 13px;
                 letter-spacing: 2px;
             }
-            .name h1 {
-                font-size: 18vw;
-            }
-            .intro span {
-                font-size: 14px;
-                letter-spacing: 5px;
+            .buttons {
+                max-width: 260px;
             }
             .close-btn {
                 width: 36px;
@@ -542,60 +310,49 @@
                 top: 12px;
                 font-size: 15px;
             }
-            .buttons {
-                gap: 14px;
-                max-width: 280px;
+            .equalizer .bar {
+                width: 3px;
             }
         }
 
         @media (max-width: 400px) {
             .btn {
-                padding: 12px 12px;
-                font-size: 13px;
+                padding: 10px 12px;
+                font-size: 12px;
                 letter-spacing: 1.5px;
-                border-radius: 40px;
-            }
-            .btn i {
-                font-size: 14px !important;
             }
             .frame {
                 height: 70vh;
                 border-radius: 16px;
             }
+            .brand h1 {
+                font-size: 15vw;
+            }
         }
 
-        /* dot dekorasi */
-        .deco-dots {
-            position: absolute;
-            bottom: 16px;
+        /* ===== AUDIO INDICATOR ===== */
+        .audio-badge {
+            position: fixed;
+            bottom: 20px;
             right: 20px;
-            z-index: 6;
-            display: flex;
-            gap: 6px;
-            opacity: 0.15;
+            z-index: 2;
+            color: rgba(255, 255, 255, 0.1);
+            font-size: 11px;
+            letter-spacing: 2px;
+            font-weight: 200;
+            pointer-events: none;
         }
-        .deco-dots span {
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            background: #00eaff;
-            animation: pulseDot 3s ease-in-out infinite alternate;
+        .audio-badge i {
+            margin-right: 6px;
+            color: rgba(0, 240, 255, 0.2);
+            animation: beat 1s ease-in-out infinite;
         }
-        .deco-dots span:nth-child(2) {
-            background: #ff3b81;
-            animation-delay: 0.6s;
-        }
-        .deco-dots span:nth-child(3) {
-            background: #b300ff;
-            animation-delay: 1.2s;
-        }
-        @keyframes pulseDot {
-            0% {
-                opacity: 0.2;
-                transform: scale(0.8);
-            }
+        @keyframes beat {
+            0%,
             100% {
-                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
                 transform: scale(1.2);
             }
         }
@@ -603,18 +360,52 @@
 </head>
 <body>
 
-    <div class="bg"></div>
+    <!-- ===== CANVAS VISUALIZER ===== -->
+    <canvas id="visualizerCanvas"></canvas>
 
-    <div class="buttons">
-        <button class="btn btn-open" onclick="openFrame()">
-            <i class="fas fa-play-circle"></i> OPEN
-        </button>
-        <div class="divider"></div>
-        <button class="btn btn-game" onclick="openGame()">
-            <i class="fas fa-gamepad"></i> GAMES
-        </button>
+    <!-- ===== OVERLAY ===== -->
+    <div class="overlay">
+        <div class="brand">
+            <h1>SODRON</h1>
+            <div class="sub">✦ 163129 ✦</div>
+        </div>
+
+        <div class="buttons">
+            <button class="btn btn-open" onclick="openFrame()">
+                <i class="fas fa-play-circle"></i> OPEN
+            </button>
+            <div class="divider"></div>
+            <button class="btn btn-game" onclick="openGame()">
+                <i class="fas fa-gamepad"></i> GAMES
+            </button>
+        </div>
+
+        <!-- Equalizer mini -->
+        <div class="equalizer" id="equalizer">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
     </div>
 
+    <div class="audio-badge">
+        <i class="fas fa-circle"></i> LIVE AUDIO
+    </div>
+
+    <!-- ===== BACKDROP & FRAME ===== -->
     <div class="backdrop" id="backdrop"></div>
 
     <div class="frame" id="frame">
@@ -623,93 +414,232 @@
         </button>
 
         <div class="scene" id="scene">
-            <div class="scene-glow"></div>
-            <div class="flash"></div>
-            <div class="intro">
-                <span>MY NAME IS</span>
-                
+            <div class="brand">
+                <h1>SODRON</h1>
+                <div class="sub">✦ 163129 ✦</div>
             </div>
-            <div class="name"><h1>SODRON</h1></div>
-            <div class="wave-ring"></div>
-            <div class="particles" id="particles"></div>
-            <div class="vignette"></div>
-            <div class="deco-dots"><span></span><span></span><span></span></div>
         </div>
 
         <iframe id="gameFrame" allow="autoplay; fullscreen"></iframe>
     </div>
 
-    <audio id="introMusic" preload="auto" loop>
+    <!-- ===== AUDIO ===== -->
+    <audio id="audioPlayer" loop crossorigin="anonymous">
         <source src="musik.mp3" type="audio/mpeg">
     </audio>
 
     <script>
-        (function() {
-            const frame = document.getElementById('frame');
-            const backdrop = document.getElementById('backdrop');
-            const scene = document.getElementById('scene');
-            const gameFrame = document.getElementById('gameFrame');
-            const introMusic = document.getElementById('introMusic');
+        // ============================================================
+        // 1. VISUALIZER
+        // ============================================================
+        const canvas = document.getElementById('visualizerCanvas');
+        const ctx = canvas.getContext('2d');
+        let W, H;
 
-            // === FUNGSI GLOBAL ===
-            window.openFrame = function() {
-                scene.style.display = 'flex';
-                gameFrame.style.display = 'none';
-                gameFrame.src = '';
-                frame.classList.add('active');
-                backdrop.classList.add('active');
-                introMusic.currentTime = 0;
-                introMusic.play().catch(function() {});
-            };
+        function resize() {
+            W = canvas.width = window.innerWidth;
+            H = canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
 
-            window.openGame = function() {
-                scene.style.display = 'none';
-                gameFrame.style.display = 'block';
-                gameFrame.src = 'https://xexmxsdrnx.github.io';
-                frame.classList.add('active');
-                backdrop.classList.add('active');
-                introMusic.pause();
-                introMusic.currentTime = 0;
-            };
+        // Audio setup
+        const audio = document.getElementById('audioPlayer');
+        let audioCtx, analyser, dataArray;
 
-            window.closeFrame = function() {
-                frame.classList.remove('active');
-                backdrop.classList.remove('active');
-                gameFrame.src = '';
-                gameFrame.style.display = 'none';
-                scene.style.display = 'flex';
-                introMusic.pause();
-                introMusic.currentTime = 0;
-            };
-
-            // backdrop & escape
-            backdrop.addEventListener('click', window.closeFrame);
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') window.closeFrame();
-            });
-
-            // === PARTICLES (lebih ringan, 90 partikel) ===
-            const container = document.getElementById('particles');
-            const colors = ['#00eaff', '#ff3b81', '#b300ff', '#ffcc00', '#6ac8ff'];
-
-            for (let i = 0; i < 90; i++) {
-                const p = document.createElement('div');
-                p.className = 'particle';
-                const angle = Math.random() * Math.PI * 2;
-                const dist = 100 + Math.random() * 600;
-                const x = Math.cos(angle) * dist;
-                const y = Math.sin(angle) * dist;
-                p.style.setProperty('--x', x + 'px');
-                p.style.setProperty('--y', y + 'px');
-                const size = 2 + Math.random() * 5;
-                p.style.width = size + 'px';
-                p.style.height = size + 'px';
-                p.style.background = colors[Math.floor(Math.random() * colors.length)];
-                p.style.boxShadow = '0 0 6px ' + p.style.background;
-                p.style.animationDelay = (Math.random() * 0.2) + 's';
-                container.appendChild(p);
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 256;
+                const source = audioCtx.createMediaElementSource(audio);
+                source.connect(analyser);
+                analyser.connect(audioCtx.destination);
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
             }
-        })();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            audio.play();
+        }
+
+        // Play audio on any click
+        document.addEventListener('click', () => {
+            if (!audioCtx) {
+                initAudio();
+            }
+            if (audio.paused) {
+                audio.play().catch(() => {});
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        });
+
+        // ===== EQUALIZER MINI (DOM) =====
+        const eqBars = document.querySelectorAll('.equalizer .bar');
+
+        function updateEqualizer(level) {
+            const scaled = Math.min(level / 128, 1);
+            eqBars.forEach((bar, i) => {
+                const h = 3 + (scaled * 16) * (0.4 + Math.random() * 0.6);
+                bar.style.height = h + 'px';
+            });
+        }
+
+        // ===== DRAW VISUALIZER =====
+        let hueOffset = 0;
+
+        function draw() {
+            requestAnimationFrame(draw);
+
+            // Analyser data
+            let avg = 0;
+            if (analyser) {
+                analyser.getByteFrequencyData(dataArray);
+                let sum = 0;
+                for (let i = 0; i < dataArray.length; i++) {
+                    sum += dataArray[i];
+                }
+                avg = sum / dataArray.length;
+                updateEqualizer(avg);
+                hueOffset += 0.15;
+            }
+
+            // Clear
+            ctx.clearRect(0, 0, W, H);
+
+            // Background gradient
+            const grad = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, W * 0.7);
+            const alpha = 0.02 + (avg / 255) * 0.04;
+            grad.addColorStop(0, `rgba(0, 240, 255, ${alpha})`);
+            grad.addColorStop(0.5, `rgba(255, 45, 120, ${alpha * 0.5})`);
+            grad.addColorStop(1, `rgba(5, 8, 12, 1)`);
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, W, H);
+
+            // ===== VISUALIZER BARS =====
+            if (analyser && dataArray) {
+                const bars = 80;
+                const barWidth = W / bars;
+                const spacing = 2;
+                const width = barWidth - spacing;
+
+                for (let i = 0; i < bars; i++) {
+                    const idx = Math.floor((i / bars) * dataArray.length);
+                    const value = dataArray[idx] || 0;
+                    const percent = value / 255;
+                    const height = percent * H * 0.35;
+
+                    const x = i * barWidth;
+                    const y = H / 2 - height / 2;
+
+                    // Warna berdasarkan frekuensi
+                    const hue = (i / bars) * 200 + 200 + Math.sin(hueOffset + i * 0.05) * 20;
+                    const lightness = 50 + percent * 30;
+
+                    ctx.fillStyle = `hsl(${hue}, 90%, ${lightness}%)`;
+                    ctx.shadowColor = `hsl(${hue}, 90%, 60%)`;
+                    ctx.shadowBlur = 10 + percent * 20;
+                    ctx.fillRect(x + spacing / 2, y, width, Math.max(height, 2));
+                }
+
+                // Glow overlay
+                ctx.shadowBlur = 0;
+
+                // ===== CIRCLE WAVE =====
+                const centerX = W / 2;
+                const centerY = H / 2 + 20;
+                const radius = Math.min(W, H) * 0.18 + (avg / 255) * 40;
+
+                for (let ring = 0; ring < 3; ring++) {
+                    const r = radius + ring * 25 + (avg / 255) * 15;
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, r, 0, Math.PI * 2);
+                    ctx.strokeStyle = `hsla(${200 + ring * 30 + hueOffset}, 90%, 70%, ${0.08 + (avg / 255) * 0.15})`;
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                }
+
+                // Pulse circle
+                const pulse = 0.5 + (avg / 255) * 0.5;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, 5 + (avg / 255) * 25, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(0, 240, 255, ${0.1 + (avg / 255) * 0.3})`;
+                ctx.shadowColor = '#00f0ff';
+                ctx.shadowBlur = 30 + (avg / 255) * 60;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+
+            // ===== GLITCH EFFECT (acak) =====
+            if (Math.random() < 0.01) {
+                const y = Math.random() * H;
+                const h = 2 + Math.random() * 8;
+                ctx.fillStyle = `rgba(0, 240, 255, ${0.03 + Math.random() * 0.05})`;
+                ctx.fillRect(0, y, W, h);
+            }
+            if (Math.random() < 0.008) {
+                const y = Math.random() * H;
+                const h = 2 + Math.random() * 6;
+                ctx.fillStyle = `rgba(255, 45, 120, ${0.03 + Math.random() * 0.04})`;
+                ctx.fillRect(0, y, W, h);
+            }
+        }
+
+        draw();
+
+        // ============================================================
+        // 2. FRAME FUNCTIONS
+        // ============================================================
+        const frame = document.getElementById('frame');
+        const backdrop = document.getElementById('backdrop');
+        const scene = document.getElementById('scene');
+        const gameFrame = document.getElementById('gameFrame');
+
+        window.openFrame = function() {
+            scene.style.display = 'flex';
+            gameFrame.style.display = 'none';
+            gameFrame.src = '';
+            frame.classList.add('active');
+            backdrop.classList.add('active');
+            // Pastikan audio tetap jalan
+            if (!audioCtx) initAudio();
+            if (audio.paused) audio.play().catch(() => {});
+        };
+
+        window.openGame = function() {
+            scene.style.display = 'none';
+            gameFrame.style.display = 'block';
+            gameFrame.src = 'https://xexmxsdrnx.github.io';
+            frame.classList.add('active');
+            backdrop.classList.add('active');
+            if (!audioCtx) initAudio();
+            if (audio.paused) audio.play().catch(() => {});
+        };
+
+        window.closeFrame = function() {
+            frame.classList.remove('active');
+            backdrop.classList.remove('active');
+            gameFrame.src = '';
+            gameFrame.style.display = 'none';
+            scene.style.display = 'flex';
+            // Audio tetap jalan
+        };
+
+        backdrop.addEventListener('click', window.closeFrame);
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') window.closeFrame();
+        });
+
+        // ============================================================
+        // 3. EQUALIZER MINI - update terus
+        // ============================================================
+        // Sudah di-update di draw() via updateEqualizer()
+
+        console.log('🎵 SODRON VISUALIZER READY!');
+        console.log('📱 Klik/tap di mana saja untuk mulai audio.');
+        console.log('✨ Cocok untuk screenshot & rekaman medsos!');
     </script>
 </body>
 </html>
