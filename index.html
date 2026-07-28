@@ -21,6 +21,8 @@
             font-family: 'Inter', 'Segoe UI', sans-serif;
             overflow: hidden;
             padding: 16px;
+            cursor: pointer;
+            /* biar jelas bisa diklik di mana saja */;
         }
 
         /* ===== CANVAS VISUALIZER ===== */
@@ -59,12 +61,7 @@
         .brand h1 {
             font-size: clamp(52px, 14vw, 150px);
             font-weight: 900;
-            color: #fff;
             letter-spacing: clamp(4px, 2vw, 16px);
-            text-shadow:
-                0 0 30px rgba(0, 240, 255, 0.3),
-                0 0 60px rgba(255, 45, 120, 0.2),
-                0 0 100px rgba(168, 85, 247, 0.1);
             background: linear-gradient(180deg, #ffffff 40%, #8ac4ff 70%, #ff2d78 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -356,6 +353,31 @@
                 transform: scale(1.2);
             }
         }
+
+        /* ===== HOVER EFFECT UNTUK BODY ===== */
+        body::after {
+            content: '🖱 klik di mana saja untuk mulai';
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+            color: rgba(255, 255, 255, 0.08);
+            font-size: 12px;
+            letter-spacing: 4px;
+            font-weight: 200;
+            pointer-events: none;
+            animation: fadeHint 4s ease-in-out infinite;
+        }
+        @keyframes fadeHint {
+            0%,
+            100% {
+                opacity: 0.3;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
@@ -367,15 +389,15 @@
     <div class="overlay">
         <div class="brand">
             <h1>SODRON</h1>
-            <div class="sub">✦ 163129 ✦</div>
+            <div class="sub">✦ music visualizer ✦</div>
         </div>
 
         <div class="buttons">
-            <button class="btn btn-open" onclick="openFrame()">
+            <button class="btn btn-open" onclick="openFrame(event)">
                 <i class="fas fa-play-circle"></i> OPEN
             </button>
             <div class="divider"></div>
-            <button class="btn btn-game" onclick="openGame()">
+            <button class="btn btn-game" onclick="openGame(event)">
                 <i class="fas fa-gamepad"></i> GAMES
             </button>
         </div>
@@ -416,7 +438,7 @@
         <div class="scene" id="scene">
             <div class="brand">
                 <h1>SODRON</h1>
-                <div class="sub">✦ 163129 ✦</div>
+                <div class="sub">✦ identity ✦</div>
             </div>
         </div>
 
@@ -430,7 +452,48 @@
 
     <script>
         // ============================================================
-        // 1. VISUALIZER
+        // 1. AUDIO ENGINE
+        // ============================================================
+        const audio = document.getElementById('audioPlayer');
+        let audioCtx = null;
+        let analyser = null;
+        let dataArray = null;
+        let isAudioReady = false;
+
+        function initAudio() {
+            if (isAudioReady) return;
+
+            try {
+                audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 256;
+
+                const source = audioCtx.createMediaElementSource(audio);
+                source.connect(analyser);
+                analyser.connect(audioCtx.destination);
+
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+                isAudioReady = true;
+
+                // Mulai audio
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                audio.play().catch(() => {});
+                console.log('🎵 Audio started!');
+            } catch (e) {
+                console.warn('Audio init error:', e);
+            }
+        }
+
+        // ===== KLIK DI MANA SAJA UNTUK MULAI =====
+        document.addEventListener('click', function firstClick() {
+            initAudio();
+            document.removeEventListener('click', firstClick);
+        });
+
+        // ============================================================
+        // 2. CANVAS VISUALIZER
         // ============================================================
         const canvas = document.getElementById('visualizerCanvas');
         const ctx = canvas.getContext('2d');
@@ -442,39 +505,6 @@
         }
         window.addEventListener('resize', resize);
         resize();
-
-        // Audio setup
-        const audio = document.getElementById('audioPlayer');
-        let audioCtx, analyser, dataArray;
-
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new(window.AudioContext || window.webkitAudioContext)();
-                analyser = audioCtx.createAnalyser();
-                analyser.fftSize = 256;
-                const source = audioCtx.createMediaElementSource(audio);
-                source.connect(analyser);
-                analyser.connect(audioCtx.destination);
-                dataArray = new Uint8Array(analyser.frequencyBinCount);
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-            audio.play();
-        }
-
-        // Play audio on any click
-        document.addEventListener('click', () => {
-            if (!audioCtx) {
-                initAudio();
-            }
-            if (audio.paused) {
-                audio.play().catch(() => {});
-            }
-            if (audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-        });
 
         // ===== EQUALIZER MINI (DOM) =====
         const eqBars = document.querySelectorAll('.equalizer .bar');
@@ -493,9 +523,8 @@
         function draw() {
             requestAnimationFrame(draw);
 
-            // Analyser data
             let avg = 0;
-            if (analyser) {
+            if (analyser && dataArray) {
                 analyser.getByteFrequencyData(dataArray);
                 let sum = 0;
                 for (let i = 0; i < dataArray.length; i++) {
@@ -534,7 +563,6 @@
                     const x = i * barWidth;
                     const y = H / 2 - height / 2;
 
-                    // Warna berdasarkan frekuensi
                     const hue = (i / bars) * 200 + 200 + Math.sin(hueOffset + i * 0.05) * 20;
                     const lightness = 50 + percent * 30;
 
@@ -544,7 +572,6 @@
                     ctx.fillRect(x + spacing / 2, y, width, Math.max(height, 2));
                 }
 
-                // Glow overlay
                 ctx.shadowBlur = 0;
 
                 // ===== CIRCLE WAVE =====
@@ -562,7 +589,6 @@
                 }
 
                 // Pulse circle
-                const pulse = 0.5 + (avg / 255) * 0.5;
                 ctx.beginPath();
                 ctx.arc(centerX, centerY, 5 + (avg / 255) * 25, 0, Math.PI * 2);
                 ctx.fillStyle = `rgba(0, 240, 255, ${0.1 + (avg / 255) * 0.3})`;
@@ -590,41 +616,54 @@
         draw();
 
         // ============================================================
-        // 2. FRAME FUNCTIONS
+        // 3. FRAME FUNCTIONS
         // ============================================================
         const frame = document.getElementById('frame');
         const backdrop = document.getElementById('backdrop');
         const scene = document.getElementById('scene');
         const gameFrame = document.getElementById('gameFrame');
 
-        window.openFrame = function() {
+        // OPEN - musik tetap jalan
+        window.openFrame = function(e) {
+            if (e) e.stopPropagation();
+
+            // Pastikan audio jalan
+            if (!isAudioReady) initAudio();
+            if (audio.paused) audio.play().catch(() => {});
+
             scene.style.display = 'flex';
             gameFrame.style.display = 'none';
             gameFrame.src = '';
             frame.classList.add('active');
             backdrop.classList.add('active');
-            // Pastikan audio tetap jalan
-            if (!audioCtx) initAudio();
-            if (audio.paused) audio.play().catch(() => {});
         };
 
-        window.openGame = function() {
+        // GAMES - musik BERHENTI
+        window.openGame = function(e) {
+            if (e) e.stopPropagation();
+
+            // HENTIKAN musik
+            audio.pause();
+            audio.currentTime = 0;
+
             scene.style.display = 'none';
             gameFrame.style.display = 'block';
             gameFrame.src = 'https://xexmxsdrnx.github.io';
             frame.classList.add('active');
             backdrop.classList.add('active');
-            if (!audioCtx) initAudio();
-            if (audio.paused) audio.play().catch(() => {});
         };
 
+        // CLOSE - musik tetap jalan (kembali ke mode visualizer)
         window.closeFrame = function() {
             frame.classList.remove('active');
             backdrop.classList.remove('active');
             gameFrame.src = '';
             gameFrame.style.display = 'none';
             scene.style.display = 'flex';
-            // Audio tetap jalan
+
+            // Pastikan audio jalan lagi
+            if (!isAudioReady) initAudio();
+            if (audio.paused) audio.play().catch(() => {});
         };
 
         backdrop.addEventListener('click', window.closeFrame);
@@ -633,13 +672,13 @@
         });
 
         // ============================================================
-        // 3. EQUALIZER MINI - update terus
+        // 4. EQUALIZER MINI - update via draw()
         // ============================================================
-        // Sudah di-update di draw() via updateEqualizer()
 
         console.log('🎵 SODRON VISUALIZER READY!');
-        console.log('📱 Klik/tap di mana saja untuk mulai audio.');
-        console.log('✨ Cocok untuk screenshot & rekaman medsos!');
+        console.log('💡 Klik di mana saja untuk mulai audio.');
+        console.log('🎮 Klik GAMES → musik berhenti');
+        console.log('📱 Cocok untuk screenshot & rekaman medsos!');
     </script>
 </body>
 </html>
