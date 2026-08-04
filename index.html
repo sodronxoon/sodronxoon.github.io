@@ -776,7 +776,7 @@
 
         /* ============ AKUN PAGE ============ */
         .akun-container {
-            max-width: 500px;
+            max-width: 550px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -802,6 +802,30 @@
             font-size: 20px;
             font-weight: 700;
             margin-bottom: 4px;
+        }
+
+        .akun-container .profile-card .account-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            background: rgba(243, 156, 18, 0.2);
+            color: #f39c12;
+            border: 1px solid rgba(243, 156, 18, 0.3);
+        }
+
+        .akun-container .profile-card .account-badge.guest {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+            border-color: rgba(46, 204, 113, 0.3);
+        }
+
+        .akun-container .profile-card .account-badge.default {
+            background: rgba(52, 152, 219, 0.2);
+            color: #3498db;
+            border-color: rgba(52, 152, 219, 0.3);
         }
 
         .akun-container .input-group {
@@ -833,6 +857,10 @@
             background: rgba(255,255,255,0.08);
         }
 
+        .akun-container .input-group input[type="password"] {
+            letter-spacing: 2px;
+        }
+
         .akun-container .btn-save {
             width: 100%;
             padding: 12px;
@@ -855,10 +883,58 @@
             transform: scale(0.98);
         }
 
+        .akun-container .btn-guest {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            border: none;
+            border-radius: 12px;
+            color: #0a0a1a;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .akun-container .btn-guest:hover {
+            transform: scale(1.02);
+        }
+
+        .akun-container .btn-guest:active {
+            transform: scale(0.98);
+        }
+
+        .akun-container .btn-default {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .akun-container .btn-default:hover {
+            transform: scale(1.02);
+        }
+
+        .akun-container .btn-default:active {
+            transform: scale(0.98);
+        }
+
         .akun-container .token-status {
             margin-top: 12px;
             font-size: 12px;
             opacity: 0.5;
+        }
+
+        .akun-container .uid-hidden {
+            display: none;
         }
 
         /* ============ SETTING PAGE ============ */
@@ -1347,12 +1423,15 @@
                     <div class="profile-card">
                         <img class="avatar-big" id="profileAvatar" src="https://i.ibb.co.com/F4zMvW25/20260712-173425.jpg" onerror="this.style.display='none'">
                         <div class="nickname" id="profileNickname">SodroN</div>
+                        <div class="account-badge" id="accountBadge">👑 Akun Utama</div>
                         <div class="input-group">
-                            <label>🎫 Update Token</label>
+                            <label>🎫 Token</label>
                             <input type="text" id="editToken" placeholder="Masukkan token baru" value="update-MyToken">
                         </div>
-                        <button class="btn-save" onclick="saveToken()">💾 Simpan Token</button>
-                        <div class="token-status" id="tokenStatus">Token tersimpan di browser</div>
+                        <button class="btn-save" onclick="saveAccountData()">💾 Simpan Akun</button>
+                        <button class="btn-guest" onclick="loginAsGuest()">👤 Coba Login Sebagai TAMU</button>
+                        <button class="btn-default" onclick="loginAsDefault()">🔙 Kembali ke Default</button>
+                        <div class="token-status" id="tokenStatus">Akun tersimpan di browser</div>
                     </div>
                 </div>
             </div>
@@ -1369,10 +1448,16 @@
                             <b>2.</b> Masukkan atau <b>Update Token</b> akun XOON Anda di kolom yang tersedia.
                         </div>
                         <div class="step">
-                            <b>3.</b> Tekan tombol <b>💾 Simpan Token</b>.
+                            <b>3.</b> Tekan tombol <b>💾 Simpan Akun</b>.
                         </div>
                         <div class="step" style="background:rgba(243,156,18,0.1);border:1px solid rgba(243,156,18,0.2);">
                             ✅ Akun XOON Anda akan terhubung dan token tersimpan di browser.
+                        </div>
+                        <div class="step" style="background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.2);margin-top:10px;">
+                            👤 <b>Login Tamu:</b> Klik tombol <b>"Coba Login Sebagai TAMU"</b> untuk menggunakan akun tamu dengan cepat.
+                        </div>
+                        <div class="step" style="background:rgba(52,152,219,0.1);border:1px solid rgba(52,152,219,0.2);margin-top:10px;">
+                            🔙 <b>Kembali ke Default:</b> Klik tombol <b>"Kembali ke Default"</b> untuk kembali ke akun utama SodroN.
                         </div>
                     </div>
                 </div>
@@ -1868,12 +1953,27 @@
         }
 
         // ============ KONFIGURASI AKUN ============
-        let ACCOUNT = {
+        // Default akun SodroN
+        const DEFAULT_ACCOUNT = {
             uid: '1756457056973000156',
             token: 'update-MyToken',
             nickname: 'SodroN',
-            avatar: 'https://i.ibb.co.com/F4zMvW25/20260712-173425.jpg'
+            avatar: 'https://i.ibb.co.com/F4zMvW25/20260712-173425.jpg',
+            isGuest: false,
+            isDefault: true
         };
+
+        // Akun Tamu
+        const GUEST_ACCOUNT = {
+            uid: '1755883510169011759',
+            token: 'nc9r4BmxIAhGGHY2MyC',
+            nickname: 'Tamu Xoon',
+            avatar: 'https://i.ibb.co.com/F4zMvW25/20260712-173425.jpg',
+            isGuest: true,
+            isDefault: false
+        };
+
+        let ACCOUNT = { ...DEFAULT_ACCOUNT };
 
         function loadAccount() {
             let saved = localStorage.getItem('account_SodroN');
@@ -1894,27 +1994,73 @@
             document.getElementById('profileAvatar').src = ACCOUNT.avatar;
             document.getElementById('profileNickname').textContent = ACCOUNT.nickname;
             document.getElementById('editToken').value = ACCOUNT.token;
+            
+            const badge = document.getElementById('accountBadge');
+            if (ACCOUNT.isDefault) {
+                badge.textContent = '👑 Akun Default (SodroN)';
+                badge.className = 'account-badge default';
+            } else if (ACCOUNT.isGuest) {
+                badge.textContent = '👤 Akun Tamu';
+                badge.className = 'account-badge guest';
+            } else {
+                badge.textContent = '👤 Akun Pengguna';
+                badge.className = 'account-badge';
+            }
         }
 
-        function saveToken() {
+        function saveAccountData() {
             let token = document.getElementById('editToken').value.trim();
+            
             if (!token) {
                 document.getElementById('tokenStatus').textContent = '❌ Token tidak boleh kosong!';
                 document.getElementById('tokenStatus').style.color = '#e74c3c';
                 return;
             }
+            
+            // Keep current UID, only update token
             ACCOUNT.token = token;
+            ACCOUNT.isGuest = false;
+            ACCOUNT.isDefault = false;
+            
             saveAccount();
-            document.getElementById('tokenStatus').textContent = '✅ Token berhasil disimpan!';
+            updateProfileDisplay();
+            document.getElementById('tokenStatus').textContent = '✅ Token berhasil diperbarui!';
             document.getElementById('tokenStatus').style.color = '#2ecc71';
+            showToast('✅ Token berhasil diperbarui!');
             setTimeout(() => {
-                document.getElementById('tokenStatus').textContent = 'Token tersimpan di browser';
+                document.getElementById('tokenStatus').textContent = 'Akun tersimpan di browser';
+                document.getElementById('tokenStatus').style.color = 'rgba(255,255,255,0.5)';
+            }, 3000);
+        }
+
+        function loginAsGuest() {
+            ACCOUNT = { ...GUEST_ACCOUNT };
+            saveAccount();
+            updateProfileDisplay();
+            document.getElementById('tokenStatus').textContent = '✅ Login sebagai Tamu berhasil!';
+            document.getElementById('tokenStatus').style.color = '#2ecc71';
+            showToast('👤 Login sebagai Tamu berhasil!');
+            setTimeout(() => {
+                document.getElementById('tokenStatus').textContent = 'Akun tamu tersimpan di browser';
+                document.getElementById('tokenStatus').style.color = 'rgba(255,255,255,0.5)';
+            }, 3000);
+        }
+
+        function loginAsDefault() {
+            ACCOUNT = { ...DEFAULT_ACCOUNT };
+            saveAccount();
+            updateProfileDisplay();
+            document.getElementById('tokenStatus').textContent = '✅ Kembali ke akun default!';
+            document.getElementById('tokenStatus').style.color = '#3498db';
+            showToast('🔙 Kembali ke akun default SodroN');
+            setTimeout(() => {
+                document.getElementById('tokenStatus').textContent = 'Akun default tersimpan di browser';
                 document.getElementById('tokenStatus').style.color = 'rgba(255,255,255,0.5)';
             }, 3000);
         }
 
         function getAuthString() {
-            return `uid=${ACCOUNT.uid}&token=${ACCOUNT.token}&nickname=${ACCOUNT.nickname}&avatar=${encodeURIComponent(ACCOUNT.avatar)}`;
+            return `uid=${ACCOUNT.uid}&token=${ACCOUNT.token}&nickname=${encodeURIComponent(ACCOUNT.nickname)}&avatar=${encodeURIComponent(ACCOUNT.avatar)}`;
         }
 
         // ============ RENDER GAME GRID ============
@@ -2132,7 +2278,8 @@
         console.log('📌 Total Lagu:', PLAYLIST.length);
         console.log('📌 Shortcut: Space (Play/Pause), Arrow Left/Right (Prev/Next)');
         console.log('📌 Kredit: Semua game dari Xoon.live');
+        console.log('👤 Akun saat ini:', ACCOUNT.nickname);
     </script>
 
 </body>
-</html>
+    </html>
