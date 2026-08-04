@@ -1,816 +1,2117 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SODRON • XOON</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SodroN</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
         }
 
         body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: radial-gradient(circle at 10% 20%, #0f0c29, #1a1a3e, #0a0a1a);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #05080c;
-            font-family: 'Inter', 'Segoe UI', sans-serif;
+            color: white;
             overflow: hidden;
-            padding: 16px;
         }
 
-        /* ===== CANVAS VISUALIZER ===== */
-        #visualizerCanvas {
+        .main-header {
+            background: rgba(20, 25, 45, 0.7);
+            backdrop-filter: blur(12px);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
             position: fixed;
-            inset: 0;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            height: 72px;
+        }
+
+        .main-header .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 22px;
+            font-weight: 800;
+            color: white;
+        }
+
+        .main-header .logo img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #f39c12;
+        }
+
+        .main-header .logo span {
+            background: linear-gradient(135deg, #f39c12, #e74c3c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+        }
+
+        .main-header .logo span::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #f39c12;
+            border-radius: 2px;
+        }
+
+        .main-header .logo span::before {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: #e74c3c;
+            border-radius: 2px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .header-actions button {
+            background: rgba(255,255,255,0.08);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .header-actions button:hover {
+            background: rgba(243, 156, 18, 0.3);
+        }
+
+        .header-actions button:active {
+            transform: scale(0.95);
+        }
+
+        .header-actions .btn-xoon {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: #0a0a1a;
+            font-weight: 700;
+        }
+
+        .header-actions .btn-xoon:hover {
+            transform: scale(1.05);
+        }
+
+        .desktop-tabs {
+            display: flex;
+            background: rgba(20, 25, 45, 0.4);
+            padding: 0 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: fixed;
+            top: 72px;
+            left: 0;
+            width: 100%;
+            z-index: 99;
+            height: 52px;
+        }
+
+        .desktop-tabs .tab-btn {
+            background: none;
+            border: none;
+            padding: 14px 24px;
+            color: rgba(255,255,255,0.5);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            position: relative;
+            border-bottom: 3px solid transparent;
+        }
+
+        .desktop-tabs .tab-btn:hover {
+            color: white;
+            background: rgba(255,255,255,0.03);
+        }
+
+        .desktop-tabs .tab-btn.active {
+            color: #f39c12;
+            border-bottom-color: #f39c12;
+        }
+
+        .main-layout {
+            position: fixed;
+            top: 124px;
+            left: 0;
+            width: 100%;
+            height: calc(100vh - 124px);
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            padding: 0;
+            margin: 0;
+            gap: 0;
+            overflow: hidden;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #0a0a1a;
+            max-width: 100%;
             width: 100%;
             height: 100%;
-            z-index: 0;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        .page-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 16px 90px 16px;
+            min-height: 0;
+            margin: 0;
+            display: none;
+        }
+
+        .page-content.active {
             display: block;
         }
 
-        /* ===== OVERLAY ===== */
-        .overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            pointer-events: none;
+        .page-content::-webkit-scrollbar {
+            width: 6px;
         }
 
-        .overlay>* {
-            pointer-events: auto;
+        .page-content::-webkit-scrollbar-thumb {
+            background: #f39c12;
+            border-radius: 10px;
         }
 
-        /* ===== SODRON ===== */
-        .brand {
-            text-align: center;
-            margin-bottom: 10px;
-            animation: pulseGlow 3s ease-in-out infinite alternate;
-        }
-
-        .brand h1 {
-            font-size: clamp(64px, 16vw, 170px);
-            font-weight: 900;
-            letter-spacing: clamp(4px, 2vw, 16px);
-            background: linear-gradient(180deg, #ffffff 40%, #8ac4ff 70%, #ff2d78 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            position: relative;
-            line-height: 1;
-        }
-
-        @keyframes pulseGlow {
-            0% {
-                filter: brightness(0.9);
-            }
-            100% {
-                filter: brightness(1.3);
-            }
-        }
-
-        /* ===== TOMBOL ===== */
-        .buttons {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 14px;
-            width: 100%;
-            max-width: 280px;
-            margin-top: 4px;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 14px 20px;
-            border: none;
-            border-radius: 50px;
-            font-size: 15px;
-            font-weight: 600;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* ============ GAME GRID ============ */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 12px;
-            background: rgba(255, 255, 255, 0.04);
-            color: #fff;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            position: relative;
-            overflow: hidden;
         }
 
-        .btn::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 50px;
-            padding: 1.5px;
-            background: linear-gradient(135deg, rgba(0, 240, 255, 0.3), rgba(255, 45, 120, 0.2));
-            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-            mask-composite: exclude;
-            -webkit-mask-composite: xor;
-            pointer-events: none;
+        .game-grid.hidden {
+            display: none;
         }
 
-        .btn:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
-        }
-        .btn:active {
-            transform: scale(0.97);
-        }
-
-        .btn-open {
-            color: #aaffff;
-            text-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
-        }
-        .btn-open:hover {
-            background: rgba(0, 240, 255, 0.06);
-            border-color: rgba(0, 240, 255, 0.15);
-        }
-        .btn-open i {
-            color: #00f0ff;
-            font-size: 16px;
-        }
-
-        .btn-game {
-            color: #ffb3cc;
-            text-shadow: 0 0 20px rgba(255, 45, 120, 0.12);
-        }
-        .btn-game:hover {
-            background: rgba(255, 45, 120, 0.06);
-            border-color: rgba(255, 45, 120, 0.15);
-        }
-        .btn-game i {
-            color: #ff2d78;
-            font-size: 16px;
-        }
-
-        .divider {
-            width: 30px;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
-        }
-
-        /* ===== EQUALIZER MINI ===== */
-        .equalizer {
-            display: flex;
-            gap: 3px;
-            height: 20px;
-            align-items: flex-end;
-            margin-top: 10px;
-            opacity: 0.3;
-        }
-        .equalizer .bar {
-            width: 4px;
-            background: linear-gradient(180deg, #00f0ff, #ff2d78);
-            border-radius: 2px;
-            transition: height 0.08s ease;
-            height: 4px;
-        }
-
-        /* ===== BACKDROP & FRAME ===== */
-        .backdrop {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.45s ease;
-            z-index: 10;
-        }
-        .backdrop.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .frame {
-            position: fixed;
-            width: min(94vw, 920px);
-            height: min(80vh, 640px);
-            overflow: hidden;
-            background: #0c121a;
-            border-radius: 28px;
-            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.04);
-            opacity: 0;
-            transform: scale(0.85) translateY(20px);
-            pointer-events: none;
-            transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-            z-index: 20;
-        }
-        .frame.active {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-            pointer-events: auto;
-        }
-
-        .close-btn {
-            position: absolute;
-            right: 18px;
-            top: 18px;
-            z-index: 200;
-            width: 42px;
-            height: 42px;
-            border: none;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(6px);
-            color: #ff8aa8;
-            font-size: 18px;
-            cursor: pointer;
-            transition: 0.25s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid rgba(255, 45, 120, 0.1);
-        }
-        .close-btn:hover {
-            background: #ff2d78;
-            color: #fff;
-            box-shadow: 0 0 30px rgba(255, 45, 120, 0.3);
-            transform: rotate(90deg);
-        }
-
-        /* ===== SCENE OPEN (isi popup) ===== */
-        .scene {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            overflow-y: auto;
-            background: #0a1017;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1;
-            padding: 40px 30px;
-        }
-
-        .scene .brand-small {
+        .game-card {
+            background: rgba(25, 32, 55, 0.7);
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            padding: 12px 6px;
             text-align: center;
-            margin-bottom: 20px;
+            cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.08);
+            position: relative;
+            transition: all 0.15s;
         }
 
-        .scene .brand-small h1 {
-            font-size: clamp(36px, 8vw, 80px);
-            font-weight: 900;
-            letter-spacing: clamp(4px, 2vw, 12px);
-            background: linear-gradient(180deg, #ffffff 40%, #8ac4ff 70%, #ff2d78 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            line-height: 1;
+        .game-card:hover {
+            transform: scale(1.03);
+            background: rgba(45, 55, 85, 0.9);
         }
 
-        .scene .brand-small .sub {
-            color: rgba(255, 255, 255, 0.2);
-            font-size: 11px;
-            letter-spacing: 6px;
-            text-transform: uppercase;
-            font-weight: 200;
-            margin-top: 2px;
+        .game-card:active {
+            transform: scale(0.96);
         }
 
-        /* ===== TYPING DI POPUP ===== */
-        .typing-container {
-            max-width: 580px;
-            width: 100%;
+        .game-img {
+            position: relative;
+            width: 70px;
+            height: 70px;
             margin: 0 auto;
         }
 
-        .typing-text {
-            color: rgba(255, 255, 255, 0.75);
-            font-size: clamp(14px, 1.5vw, 18px);
-            font-weight: 300;
-            line-height: 1.9;
-            text-align: left;
-            min-height: 140px;
-            letter-spacing: 0.3px;
-            padding: 0 4px;
+        .game-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
-        .typing-text .highlight {
-            color: #00f0ff;
-            font-weight: 400;
+        .game-name {
+            font-size: 11px;
+            font-weight: 500;
+            margin-top: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .typing-text .highlight-pink {
-            color: #ff2d78;
-            font-weight: 400;
-        }
-
-        .cursor-blink {
-            display: inline-block;
-            width: 2px;
-            height: 1em;
-            background: #00f0ff;
-            margin-left: 2px;
-            vertical-align: text-bottom;
-            animation: blink 0.8s step-end infinite;
-        }
-
-        @keyframes blink {
-            0%,
-            100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0;
-            }
-        }
-
-        /* ===== EMAIL DI POPUP ===== */
-        .email-link-popup {
-            color: rgba(255, 255, 255, 0.35);
-            font-size: clamp(13px, 1.1vw, 16px);
-            text-decoration: none;
-            letter-spacing: 1px;
-            transition: 0.3s;
-            font-weight: 200;
-            margin-top: 16px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            padding: 8px 18px;
-            border-radius: 30px;
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        .email-link-popup:hover {
-            color: #00f0ff;
-            border-color: rgba(0, 240, 255, 0.15);
-            box-shadow: 0 0 30px rgba(0, 240, 255, 0.05);
-        }
-
-        .email-link-popup i {
-            color: #ff2d78;
-            font-size: 14px;
-        }
-
-        /* ===== GAME IFRAME ===== */
-        #gameFrame {
+        .moneyjar-sticker {
             position: absolute;
-            inset: 0;
+            bottom: -4px;
+            left: -4px;
+            background: linear-gradient(135deg, #FFD700, #FF8C00);
+            color: #1a1a2e;
+            font-size: 8px;
+            font-weight: bold;
+            padding: 2px 4px;
+            border-radius: 10px;
+            z-index: 5;
+            white-space: nowrap;
+        }
+
+        /* ============ GAME PLAY ============ */
+        .game-play-container {
+            display: none;
+            flex-direction: row;
+            flex: 1;
+            min-height: 0;
+            margin-top: 0;
+            gap: 0;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+            height: 100%;
+            max-height: 100%;
+        }
+
+        .game-play-container.active {
+            display: flex;
+        }
+
+        .game-play-sidebar {
+            width: 85px;
+            flex-shrink: 0;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 8px 4px;
+            gap: 8px;
+            height: 100%;
+            max-height: 100%;
+        }
+
+        .game-play-sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .game-play-sidebar::-webkit-scrollbar-thumb {
+            background: #f39c12;
+            border-radius: 10px;
+        }
+
+        .game-play-sidebar .sidebar-game-item {
+            text-align: center;
+            padding: 6px 4px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.1s;
+            background: rgba(255,255,255,0.05);
+            flex-shrink: 0;
+        }
+
+        .game-play-sidebar .sidebar-game-item:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .game-play-sidebar .sidebar-game-item:active {
+            background: #f39c12;
+            transform: scale(0.95);
+        }
+
+        .game-play-sidebar .sidebar-game-item.active {
+            background: #f39c12;
+        }
+
+        .game-play-sidebar .sidebar-game-item.active .side-name {
+            color: #0f0c29;
+            font-weight: bold;
+        }
+
+        .game-play-sidebar .sidebar-game-item .side-img {
+            width: 55px;
+            height: 55px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 4px;
+        }
+
+        .game-play-sidebar .sidebar-game-item .side-name {
+            font-size: 9px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 70px;
+            opacity: 0.7;
+        }
+
+        .game-play-sidebar .sidebar-game-item.active .side-name {
+            opacity: 1;
+            color: #0f0c29;
+        }
+
+        .game-frame-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #000;
+            min-height: 0;
+            overflow: hidden;
+            height: 100%;
+            max-height: 100%;
+        }
+
+        .game-frame-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background: #111;
+            border-bottom: 1px solid #333;
+            flex-shrink: 0;
+        }
+
+        .game-frame-header .frame-title {
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0.8;
+        }
+
+        .game-frame-header .frame-title strong {
+            color: #f39c12;
+            opacity: 1;
+        }
+
+        .game-frame-header .btn-close-frame {
+            background: #e74c3c;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .game-frame-container .frame-body {
+            flex: 1;
+            position: relative;
+            background: #000;
+            overflow: hidden;
+        }
+
+        .game-frame-container iframe {
             width: 100%;
             height: 100%;
             border: none;
             background: #000;
-            z-index: 2;
-            display: none;
         }
 
-        /* ===== SCROLLBAR ===== */
-        .scene::-webkit-scrollbar {
-            width: 3px;
+        .game-frame-container .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 26, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: opacity 0.4s;
         }
-        .scene::-webkit-scrollbar-track {
-            background: transparent;
+
+        .game-frame-container .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
         }
-        .scene::-webkit-scrollbar-thumb {
-            background: rgba(0, 240, 255, 0.2);
+
+        .game-frame-container .loading-overlay .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(243, 156, 18, 0.1);
+            border-top-color: #f39c12;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .game-frame-container .loading-overlay p {
+            margin-top: 12px;
+            font-size: 13px;
+            opacity: 0.6;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ============ MUSIK PAGE ============ */
+        .musik-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            height: 100%;
+            padding-bottom: 10px;
+        }
+
+        .musik-container .musik-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .musik-container .musik-header h2 {
+            color: #f39c12;
+            font-size: 20px;
+        }
+
+        .musik-container .musik-header .now-playing {
+            font-size: 13px;
+            opacity: 0.7;
+        }
+
+        .musik-container .musik-header .now-playing strong {
+            color: #f39c12;
+            opacity: 1;
+        }
+
+        .musik-container .musik-body {
+            display: flex;
+            gap: 16px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .musik-playlist {
+            width: 280px;
+            flex-shrink: 0;
+            background: rgba(25, 32, 55, 0.5);
+            border-radius: 16px;
+            padding: 12px;
+            overflow-y: auto;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .musik-playlist::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .musik-playlist::-webkit-scrollbar-thumb {
+            background: #f39c12;
             border-radius: 10px;
         }
 
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 640px) {
-            .frame {
-                width: 96vw;
-                height: 80vh;
-                border-radius: 20px;
-            }
-            .btn {
-                padding: 12px 16px;
-                font-size: 13px;
-                letter-spacing: 2px;
-            }
-            .buttons {
-                max-width: 240px;
-            }
-            .close-btn {
-                width: 36px;
-                height: 36px;
-                right: 12px;
-                top: 12px;
-                font-size: 15px;
-            }
-            .equalizer .bar {
-                width: 3px;
-            }
-            .scene {
-                padding: 30px 18px;
-            }
-            .typing-text {
-                font-size: 14px;
-                min-height: 120px;
-            }
+        .musik-playlist .playlist-title {
+            font-size: 12px;
+            opacity: 0.5;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        @media (max-width: 400px) {
-            .btn {
-                padding: 10px 12px;
-                font-size: 12px;
-                letter-spacing: 1.5px;
-            }
-            .frame {
-                height: 72vh;
-                border-radius: 16px;
-            }
-            .brand h1 {
-                font-size: 15vw;
-            }
-            .scene .brand-small h1 {
-                font-size: 32px;
-            }
-            .typing-text {
-                font-size: 13px;
-                min-height: 100px;
-            }
+        .musik-playlist .playlist-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.15s;
+            margin-bottom: 4px;
         }
 
-        /* ===== AUDIO BADGE ===== */
-        .audio-badge {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 2;
-            color: rgba(255, 255, 255, 0.06);
+        .musik-playlist .playlist-item:hover {
+            background: rgba(255,255,255,0.06);
+        }
+
+        .musik-playlist .playlist-item.active {
+            background: rgba(243, 156, 18, 0.2);
+            border-left: 3px solid #f39c12;
+        }
+
+        .musik-playlist .playlist-item .song-number {
             font-size: 11px;
-            letter-spacing: 2px;
-            font-weight: 200;
+            opacity: 0.4;
+            width: 24px;
+            text-align: center;
+        }
+
+        .musik-playlist .playlist-item .song-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .musik-playlist .playlist-item .song-info .song-name {
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .musik-playlist .playlist-item .song-info .song-artist {
+            font-size: 10px;
+            opacity: 0.5;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .musik-playlist .playlist-item .play-icon {
+            font-size: 14px;
+            opacity: 0.3;
+        }
+
+        .musik-playlist .playlist-item.active .play-icon {
+            opacity: 1;
+            color: #f39c12;
+        }
+
+        .musik-playlist .playlist-item.playing .play-icon {
+            animation: pulse 1s ease-in-out infinite;
+            color: #2ecc71;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .musik-player-wrapper {
+            flex: 1;
+            background: rgba(25, 32, 55, 0.7);
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .musik-player-wrapper::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 40%, rgba(243, 156, 18, 0.05), transparent 60%);
+            animation: bgGlow 8s ease-in-out infinite alternate;
             pointer-events: none;
         }
-        .audio-badge i {
-            margin-right: 6px;
-            color: rgba(0, 240, 255, 0.12);
-            animation: beat 1s ease-in-out infinite;
+
+        @keyframes bgGlow {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(10%, 10%) scale(1.2); }
         }
-        @keyframes beat {
-            0%,
-            100% {
-                transform: scale(1);
+
+        .musik-cover {
+            width: 80px;
+            height: 80px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #f39c12, #e74c3c);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 8px 32px rgba(243, 156, 18, 0.3);
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+            align-self: center;
+        }
+
+        .musik-cover.playing {
+            animation: coverSpin 20s linear infinite;
+        }
+
+        @keyframes coverSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .musik-info {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            width: 100%;
+        }
+
+        .musik-info .song-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .musik-info .song-artist {
+            font-size: 12px;
+            opacity: 0.6;
+            margin-top: 2px;
+        }
+
+        .musik-iframe-wrap {
+            width: 100%;
+            height: 0;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            flex-shrink: 0;
+        }
+
+        .musik-iframe-wrap iframe {
+            width: 100%;
+            height: 166px;
+            border: none;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+
+        .musik-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            position: relative;
+            z-index: 1;
+            flex-wrap: wrap;
+        }
+
+        .musik-controls button {
+            background: rgba(255,255,255,0.06);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .musik-controls button:hover {
+            background: rgba(255,255,255,0.12);
+            transform: scale(1.05);
+        }
+
+        .musik-controls button:active {
+            transform: scale(0.95);
+        }
+
+        .musik-controls .btn-shuffle.active {
+            color: #f39c12;
+            background: rgba(243, 156, 18, 0.2);
+            box-shadow: 0 0 20px rgba(243, 156, 18, 0.2);
+        }
+
+        .musik-controls .btn-repeat.active {
+            color: #f39c12;
+            background: rgba(243, 156, 18, 0.2);
+            box-shadow: 0 0 20px rgba(243, 156, 18, 0.2);
+        }
+
+        .musik-controls .btn-shuffle.active:hover,
+        .musik-controls .btn-repeat.active:hover {
+            background: rgba(243, 156, 18, 0.3);
+            box-shadow: 0 0 30px rgba(243, 156, 18, 0.3);
+        }
+
+        .musik-controls .btn-play {
+            width: 54px;
+            height: 54px;
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            font-size: 24px;
+            box-shadow: 0 4px 20px rgba(243, 156, 18, 0.3);
+        }
+
+        .musik-controls .btn-play:hover {
+            transform: scale(1.08);
+            box-shadow: 0 4px 30px rgba(243, 156, 18, 0.5);
+        }
+
+        .musik-controls .btn-play:active {
+            transform: scale(0.95);
+        }
+
+        .musik-controls .btn-play.playing {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            box-shadow: 0 4px 20px rgba(231, 76, 60, 0.3);
+        }
+
+        .musik-controls .btn-play.playing:hover {
+            box-shadow: 0 4px 30px rgba(231, 76, 60, 0.5);
+        }
+
+        /* ============ AKUN PAGE ============ */
+        .akun-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .akun-container .profile-card {
+            background: rgba(25, 32, 55, 0.7);
+            border-radius: 24px;
+            padding: 24px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .akun-container .profile-card .avatar-big {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #f39c12;
+            margin-bottom: 12px;
+        }
+
+        .akun-container .profile-card .nickname {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .akun-container .input-group {
+            text-align: left;
+            margin-top: 16px;
+        }
+
+        .akun-container .input-group label {
+            display: block;
+            font-size: 12px;
+            opacity: 0.7;
+            margin-bottom: 6px;
+        }
+
+        .akun-container .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .akun-container .input-group input:focus {
+            outline: none;
+            border-color: #f39c12;
+            background: rgba(255,255,255,0.08);
+        }
+
+        .akun-container .btn-save {
+            width: 100%;
+            padding: 12px;
+            margin-top: 16px;
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            border: none;
+            border-radius: 12px;
+            color: #0a0a1a;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .akun-container .btn-save:hover {
+            transform: scale(1.02);
+        }
+
+        .akun-container .btn-save:active {
+            transform: scale(0.98);
+        }
+
+        .akun-container .token-status {
+            margin-top: 12px;
+            font-size: 12px;
+            opacity: 0.5;
+        }
+
+        /* ============ SETTING PAGE ============ */
+        .setting-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .setting-container .card {
+            background: rgba(25, 32, 55, 0.7);
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .setting-container .card h3 {
+            margin-bottom: 16px;
+            color: #f39c12;
+        }
+
+        .setting-container .card .step {
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .setting-container .card .step b {
+            color: #f39c12;
+        }
+
+        /* ============ ABOUT PAGE ============ */
+        .about-container {
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .about-container .about-card {
+            background: rgba(25, 32, 55, 0.7);
+            border-radius: 24px;
+            padding: 30px 24px;
+            border: 1px solid rgba(255,255,255,0.08);
+            text-align: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .about-container .about-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #f39c12;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 32px rgba(243, 156, 18, 0.3);
+        }
+
+        .about-container .about-name {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f39c12, #e74c3c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+        }
+
+        .about-container .about-role {
+            font-size: 14px;
+            opacity: 0.6;
+            margin-bottom: 16px;
+        }
+
+        .about-container .about-bio {
+            font-size: 14px;
+            line-height: 1.8;
+            opacity: 0.85;
+            text-align: left;
+            padding: 0 8px;
+            margin-bottom: 16px;
+        }
+
+        .about-container .about-bio span {
+            color: #f39c12;
+            font-weight: 600;
+        }
+
+        .about-container .about-bio .highlight-box {
+            background: rgba(243, 156, 18, 0.08);
+            border-left: 3px solid #f39c12;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+
+        .about-container .about-bio .highlight-box .emoji {
+            font-size: 18px;
+        }
+
+        .about-container .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .about-container .social-links a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 30px;
+            color: white;
+            text-decoration: none;
+            font-size: 13px;
+            transition: 0.3s;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .about-container .social-links a:hover {
+            background: rgba(243, 156, 18, 0.2);
+            border-color: #f39c12;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(243, 156, 18, 0.15);
+        }
+
+        .about-container .social-links a:active {
+            transform: scale(0.95);
+        }
+
+        .about-container .social-links .social-icon {
+            font-size: 18px;
+        }
+
+        .about-container .social-links .link-xoon {
+            background: linear-gradient(135deg, rgba(243, 156, 18, 0.2), rgba(231, 76, 60, 0.2));
+            border-color: #f39c12;
+        }
+
+        .about-container .social-links .link-xoon:hover {
+            background: linear-gradient(135deg, rgba(243, 156, 18, 0.35), rgba(231, 76, 60, 0.35));
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .about-container .about-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .about-container .about-stats .stat-item {
+            text-align: center;
+        }
+
+        .about-container .about-stats .stat-number {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f39c12;
+        }
+
+        .about-container .about-stats .stat-label {
+            font-size: 10px;
+            opacity: 0.5;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        .about-container .version-info {
+            margin-top: 16px;
+            font-size: 11px;
+            opacity: 0.3;
+            text-align: center;
+        }
+
+        .about-container .credit-note {
+            margin-top: 12px;
+            padding: 12px 16px;
+            background: rgba(231, 76, 60, 0.08);
+            border-radius: 12px;
+            border: 1px solid rgba(231, 76, 60, 0.15);
+            font-size: 12px;
+            opacity: 0.7;
+            text-align: center;
+        }
+
+        .about-container .credit-note strong {
+            color: #e74c3c;
+            opacity: 1;
+        }
+
+        /* ============ MOBILE BOTTOM NAV ============ */
+        .mobile-bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(10, 10, 26, 0.95);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding: 8px 0;
+            z-index: 200;
+        }
+
+        .mobile-bottom-nav .nav-items {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .mobile-bottom-nav .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: rgba(255,255,255,0.5);
+            font-size: 10px;
+            transition: 0.15s;
+            border: none;
+            background: none;
+        }
+
+        .mobile-bottom-nav .nav-item.active {
+            color: #f39c12;
+        }
+
+        .mobile-bottom-nav .nav-item .icon {
+            font-size: 20px;
+        }
+
+        .toast-notif {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(12px);
+            padding: 12px 24px;
+            border-radius: 60px;
+            z-index: 2000;
+            font-weight: bold;
+            animation: fadeOut 2.5s ease forwards;
+            border-left: 4px solid #f39c12;
+            white-space: nowrap;
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            70% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+
+        @media (max-width: 768px) {
+            .desktop-tabs { display: none; }
+            .mobile-bottom-nav { display: block; }
+            .main-layout {
+                top: 72px;
+                height: calc(100vh - 72px - 60px);
+                padding: 0;
             }
-            50% {
-                transform: scale(1.2);
+            .main-content { max-width: 100%; border-radius: 0; }
+            .game-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+            .main-header .logo { font-size: 18px; }
+            .main-header .logo img { width: 32px; height: 32px; }
+            .header-actions button { font-size: 10px; padding: 6px 12px; }
+            .akun-container, .setting-container { padding: 12px; }
+            .page-content { padding: 12px 12px 80px 12px; }
+            .toast-notif { bottom: 70px; }
+
+            .musik-container .musik-body {
+                flex-direction: column;
             }
+            .musik-playlist {
+                width: 100%;
+                max-height: 160px;
+                flex-shrink: 0;
+            }
+            .musik-player-wrapper {
+                min-height: 280px;
+                padding: 12px;
+            }
+            .musik-cover {
+                width: 60px;
+                height: 60px;
+                font-size: 24px;
+            }
+            .musik-info .song-title {
+                font-size: 14px;
+            }
+            .musik-controls button {
+                width: 34px;
+                height: 34px;
+                font-size: 14px;
+            }
+            .musik-controls .btn-play {
+                width: 46px;
+                height: 46px;
+                font-size: 20px;
+            }
+
+            .game-play-container {
+                flex-direction: row;
+                border-radius: 12px;
+                overflow: hidden;
+                height: 100%;
+                max-height: 100%;
+            }
+            .game-play-sidebar {
+                width: 85px;
+                height: 100%;
+                max-height: 100%;
+                flex-shrink: 0;
+                flex-direction: column;
+                overflow-y: auto;
+                overflow-x: hidden;
+                padding: 8px 4px;
+                gap: 8px;
+                border-right: 1px solid rgba(255,255,255,0.1);
+                border-bottom: none;
+            }
+            .game-play-sidebar .sidebar-game-item {
+                width: 100%;
+                padding: 6px 4px;
+                flex-shrink: 0;
+            }
+            .game-play-sidebar .sidebar-game-item .side-img {
+                width: 55px;
+                height: 55px;
+                margin-bottom: 4px;
+            }
+            .game-play-sidebar .sidebar-game-item .side-name {
+                font-size: 9px;
+                max-width: 70px;
+            }
+            .game-frame-container {
+                min-height: 300px;
+                overflow: hidden;
+                height: 100%;
+                max-height: 100%;
+            }
+            .about-container .about-avatar {
+                width: 90px;
+                height: 90px;
+            }
+            .about-container .about-name {
+                font-size: 20px;
+            }
+            .about-container .social-links a {
+                padding: 8px 14px;
+                font-size: 12px;
+            }
+            .about-container .about-stats {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+            .about-container .about-stats .stat-number {
+                font-size: 16px;
+            }
+            .about-container .about-bio {
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .game-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+            .game-card { padding: 8px 4px; }
+            .game-img { width: 55px; height: 55px; }
+            .game-name { font-size: 9px; }
+            .page-content { padding: 8px 8px 70px 8px; }
+            .toast-notif { bottom: 65px; font-size: 12px; padding: 8px 16px; }
+
+            .musik-playlist { max-height: 120px; }
+            .musik-player-wrapper { min-height: 240px; padding: 10px; }
+            .musik-cover { width: 50px; height: 50px; font-size: 20px; }
+            .musik-info .song-title { font-size: 13px; }
+            .musik-controls button { width: 30px; height: 30px; font-size: 12px; }
+            .musik-controls .btn-play { width: 40px; height: 40px; font-size: 16px; }
+
+            .game-frame-container { min-height: 200px; }
+            .game-play-sidebar { width: 70px; }
+            .game-play-sidebar .sidebar-game-item .side-img { width: 45px; height: 45px; }
+            .game-play-sidebar .sidebar-game-item .side-name { font-size: 8px; max-width: 55px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== CANVAS VISUALIZER ===== -->
-    <canvas id="visualizerCanvas"></canvas>
-
-    <!-- ===== OVERLAY ===== -->
-    <div class="overlay">
-        <div class="brand">
-            <h1>SODRON</h1>
+    <!-- ============ HEADER ============ -->
+    <header class="main-header">
+        <div class="logo">
+            <img src="https://i.ibb.co.com/F4zMvW25/20260712-173425.jpg" alt="SodroN" onerror="this.style.display='none'">
+            <span>SodroN</span>
         </div>
-
-        <div class="buttons">
-            <button class="btn btn-open" onclick="openFrame()">
-                <i class="fas fa-play-circle"></i> OPEN
-            </button>
-            <div class="divider"></div>
-            <button class="btn btn-game" onclick="openGame()">
-                <i class="fas fa-gamepad"></i> GAMES
-            </button>
+        <div class="header-actions">
+            <button onclick="location.reload()">🔄 Refresh</button>
+            <button class="btn-xoon" onclick="openXoon()">🚀 Xoon.live</button>
         </div>
+    </header>
 
-        <!-- Equalizer mini -->
-        <div class="equalizer" id="equalizer">
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-        </div>
+    <!-- ============ DESKTOP TABS ============ -->
+    <div class="desktop-tabs" id="desktopTabs">
+        <button class="tab-btn active" data-tab="musik" onclick="switchTab('musik')">🎵 Musik</button>
+        <button class="tab-btn" data-tab="games" onclick="switchTab('games')">🎰 Games</button>
+        <button class="tab-btn" data-tab="akun" onclick="switchTab('akun')">👤 Akun</button>
+        <button class="tab-btn" data-tab="setting" onclick="switchTab('setting')">📢 Info</button>
+        <button class="tab-btn" data-tab="about" onclick="switchTab('about')">😎 About Me</button>
     </div>
 
-    <div class="audio-badge">
-        <i class="fas fa-circle"></i> LIVE
-    </div>
+    <!-- ============ MAIN LAYOUT ============ -->
+    <div class="main-layout">
+        <div class="main-content">
 
-    <!-- ===== BACKDROP & FRAME ===== -->
-    <div class="backdrop" id="backdrop"></div>
+            <!-- ===== PAGE: MUSIK ===== -->
+            <div class="page-content active" id="page-musik">
+                <div class="musik-container">
+                    <div class="musik-header">
+                        <h2>🎵 Music Player</h2>
+                        <div class="now-playing">🎶 Now Playing: <strong id="nowPlayingName">-</strong></div>
+                    </div>
+                    <div class="musik-body">
+                        <!-- PLAYLIST -->
+                        <div class="musik-playlist" id="musikPlaylist">
+                            <div class="playlist-title">📋 Daftar Lagu</div>
+                        </div>
 
-    <div class="frame" id="frame">
-        <button class="close-btn" onclick="closeFrame()">
-            <i class="fas fa-times"></i>
-        </button>
-
-        <!-- SCENE OPEN (isi popup) -->
-        <div class="scene" id="scene">
-            <div class="brand-small">
-                <h1>SODRON</h1>
-                <div class="sub">✦ welcome ✦</div>
-            </div>
-
-            <div class="typing-container">
-                <div class="typing-text" id="typingText">
-                    <span id="typedContent"></span><span class="cursor-blink"></span>
+                        <!-- PLAYER -->
+                        <div class="musik-player-wrapper">
+                            <div class="musik-cover" id="musikCover">
+                                <span>🎵</span>
+                            </div>
+                            <div class="musik-info">
+                                <div class="song-title" id="songTitle">-</div>
+                                <div class="song-artist" id="songArtist">-</div>
+                            </div>
+                            <div class="musik-iframe-wrap">
+                                <iframe id="musikFrame" src="" allow="autoplay; encrypted-media"></iframe>
+                            </div>
+                            <div class="musik-controls">
+                                <button class="btn-shuffle" id="btnShuffle" onclick="toggleShuffle()" title="Shuffle">🔀</button>
+                                <button class="btn-prev" onclick="prevSong()" title="Previous">⏮</button>
+                                <button class="btn-play" id="btnPlay" onclick="togglePlay()">▶</button>
+                                <button class="btn-next" onclick="nextSong()" title="Next">⏭</button>
+                                <button class="btn-repeat" id="btnRepeat" onclick="toggleRepeat()" title="Repeat">🔁</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <a href="mailto:sodron.xoon@gmail.com" class="email-link-popup">
-                <i class="fas fa-envelope"></i> sodron.xoon@gmail.com
-            </a>
-        </div>
+            <!-- ===== PAGE: GAMES ===== -->
+            <div class="page-content" id="page-games">
+                <div class="game-grid" id="gameGridGames"></div>
 
-        <!-- GAME IFRAME -->
-        <iframe id="gameFrame" allow="autoplay; fullscreen"></iframe>
+                <div class="game-play-container" id="gamePlayContainer">
+                    <div class="game-play-sidebar" id="gamePlaySidebar"></div>
+                    <div class="game-frame-container" id="gameFrameContainer">
+                        <div class="game-frame-header">
+                            <span class="frame-title">🎮 <strong id="gameFrameTitle">Game</strong></span>
+                            <button class="btn-close-frame" onclick="closeGameFrame()">✕ Close</button>
+                        </div>
+                        <div class="frame-body">
+                            <div class="loading-overlay" id="gameFrameLoading">
+                                <div class="spinner"></div>
+                                <p>Memuat game...</p>
+                            </div>
+                            <iframe id="gameFrame" src="about:blank" allow="fullscreen"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== PAGE: AKUN ===== -->
+            <div class="page-content" id="page-akun">
+                <div class="akun-container">
+                    <div class="profile-card">
+                        <img class="avatar-big" id="profileAvatar" src="https://i.ibb.co.com/F4zMvW25/20260712-173425.jpg" onerror="this.style.display='none'">
+                        <div class="nickname" id="profileNickname">SodroN</div>
+                        <div class="input-group">
+                            <label>🎫 Update Token</label>
+                            <input type="text" id="editToken" placeholder="Masukkan token baru" value="update-MyToken">
+                        </div>
+                        <button class="btn-save" onclick="saveToken()">💾 Simpan Token</button>
+                        <div class="token-status" id="tokenStatus">Token tersimpan di browser</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== PAGE: SETTING ===== -->
+            <div class="page-content" id="page-setting">
+                <div class="setting-container">
+                    <div class="card">
+                        <h3>🔗 CARA MENGKONEKAN AKUN</h3>
+                        <div class="step">
+                            <b>1.</b> Klik Menu <b>Akun</b>.
+                        </div>
+                        <div class="step">
+                            <b>2.</b> Masukkan atau <b>Update Token</b> akun XOON Anda di kolom yang tersedia.
+                        </div>
+                        <div class="step">
+                            <b>3.</b> Tekan tombol <b>💾 Simpan Token</b>.
+                        </div>
+                        <div class="step" style="background:rgba(243,156,18,0.1);border:1px solid rgba(243,156,18,0.2);">
+                            ✅ Akun XOON Anda akan terhubung dan token tersimpan di browser.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== PAGE: ABOUT ===== -->
+            <div class="page-content" id="page-about">
+                <div class="about-container">
+                    <div class="about-card">
+                        <img class="about-avatar" src="https://i.ibb.co.com/F4zMvW25/20260712-173425.jpg" alt="SodroN" onerror="this.style.display='none'">
+                        <div class="about-name">SodroN</div>
+                        <div class="about-role">🚀 Web Enthusiast & Gamer</div>
+
+                        <div class="about-bio">
+                        <center>    <p>
+                                Halo! Saya <span>SodroN</span>, seorang penggemar teknologi dan pecinta game. <br>
+                                Saya membuat website ini sebagai <span>proyek pribadi</span>
+                            </p> 
+                            <br>
+                            <div class="highlight-box">
+                                <div class="emoji">⚠️</div>
+                                <strong style="color:#e74c3c;">Catatan Penting:</strong><br>
+                                Semua game yang tersedia di halaman <span>Games</span> <strong style="color:#e74c3c;">BUKAN</strong> buatan saya. 
+                                Saya hanya mengumpulkan dan menyediakan link akses cepat dari platform 
+                                <span>Xoon.live</span> untuk bermain secara offline
+                            </div>
+                            <br>
+                                                        <p>
+                                🎮 Saya suka bermain game, mendengarkan musik, dan terus belajar hal-hal baru 
+                                di dunia pemrograman. Platform ini saya buat untuk <span>kebutuhan pribadi</span> 
+                                dan <strong>saya tidak akan mengupdate apapun lagi</strong> ke depannya. 
+                                Jika suatu saat terjadi <span>masalah link error</span> atau ada 
+                                <span>perubahan dari web resmi Xoon</span>, saya mohon maklum.
+                            </p>
+                            <br>
+                            <p>
+                                🔐 Bagi kalian yang ingin mencoba mengaplikasikan ke akun masing-masing, 
+                                cukup <span>masukkan token akun</span> kalian di menu Akun. 
+                                Token kalian <strong>AMAN</strong> karena semua aktivitas di web ini 
+                                akan tersimpan di <span>browser kalian masing-masing</span> 
+                                dan <strong>tidak akan bocor ke publik</strong>.
+                            </p>
+                            <br>
+                            <p> </center>
+                                💡 <span>#AlwaysLearning #CodeIsArt</span>
+                            </p>
+                        </div>
+<center>
+                        <div class="social-links">
+                            <a href="#" onclick="showToast('🌐 Website: Coming Soon!')">
+                                <span class="social-icon">🌐</span> Website
+                            </a>
+                            <a href="#" onclick="showToast('🐦 Twitter: Coming Soon!')">
+                                <span class="social-icon">🐦</span> Twitter
+                            </a>
+                            <a href="#" onclick="showToast('💻 GitHub: Coming Soon!')">
+                                <span class="social-icon">💻</span> GitHub
+                            </a>
+                            <a href="#" onclick="showToast('📸 Instagram: Coming Soon!')">
+                                <span class="social-icon">📸</span> Instagram
+                            </a>
+                            <a href="#" onclick="showToast('📱 TikTok: Coming Soon!')">
+                                <span class="social-icon">📱</span> TikTok
+                            </a>
+                        </div>
+</center>
+                        <!-- Tombol Xoon.live -->
+                        <div style="margin-top: 16px; text-align: center;">
+                            <button onclick="openXoon()" 
+                                    style="display: inline-flex; align-items: center; gap: 10px; 
+                                           padding: 12px 32px; 
+                                           background: linear-gradient(135deg, #f39c12, #e67e22); 
+                                           border: none;
+                                           border-radius: 30px; 
+                                           color: #0a0a1a; 
+                                           font-weight: 700; 
+                                           font-size: 15px;
+                                           cursor: pointer;
+                                           transition: 0.3s;
+                                           box-shadow: 0 4px 20px rgba(243, 156, 18, 0.3);"
+                                    onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 8px 30px rgba(243, 156, 18, 0.5)'"
+                                    onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 20px rgba(243, 156, 18, 0.3)'"
+                                    onmousedown="this.style.transform='scale(0.95)'"
+                                    onmouseup="this.style.transform='scale(1.05)'">
+                                🚀 Kunjungi Xoon.live
+                            </button>
+                        </div>
+
+                        <div class="about-stats">
+                            <div class="stat-item">
+                                <div class="stat-number" id="totalGames">0</div>
+                                <div class="stat-label">🎮 Total Games</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="totalSongs">0</div>
+                                <div class="stat-label">🎵 Total Lagu</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">v2.0</div>
+                                <div class="stat-label">📦 Version</div>
+                            </div>
+                        </div>
+
+                        <div class="credit-note">
+                            📌 <strong></strong> Semua game berasal dari <strong>Xoon.live</strong>
+                            Saya tidak memiliki hak cipta atas game-game tersebut.
+                        </div>
+
+                        <div class="version-info">
+                            © 2026 SodroN | Dibuat dengan ❤️ dan ☕
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
 
-    <!-- ===== AUDIO ===== -->
-    <audio id="audioPlayer" loop crossorigin="anonymous">
-        <source src="musik.mp3" type="audio/mpeg">
-    </audio>
+    <!-- ============ MOBILE BOTTOM NAV ============ -->
+    <nav class="mobile-bottom-nav" id="mobileNav">
+        <div class="nav-items">
+            <button class="nav-item active" data-tab="musik" onclick="switchTab('musik')">
+                <span class="icon">🎵</span>
+                <span>Musik</span>
+            </button>
+            <button class="nav-item" data-tab="games" onclick="switchTab('games')">
+                <span class="icon">🎰</span>
+                <span>Games</span>
+            </button>
+            <button class="nav-item" data-tab="akun" onclick="switchTab('akun')">
+                <span class="icon">👤</span>
+                <span>Akun</span>
+            </button>
+            <button class="nav-item" data-tab="setting" onclick="switchTab('setting')">
+                <span class="icon">📢</span>
+                <span>Info</span>
+            </button>
+            <button class="nav-item" data-tab="about" onclick="switchTab('about')">
+                <span class="icon">😎</span>
+                <span>About Me</span>
+            </button>
+        </div>
+    </nav>
 
     <script>
-        // ============================================================
-        // 1. TYPING EFFECT (di popup)
-        // ============================================================
-        const text =
-            'Selamat datang di welcome! Terimakasih sudah mampir ke situs yang gak penting ini, situs ini sebenarnya aku buat untuk pribadi, tapi kalian juga bisa menggunakanNya. intinya situs ini untuk memainkan Game <span class="highlight">xoon</span> dalam posisi offline (tidak online lewat aplikasi xoon).<br><br>kalau kesulitan menemukan Token, bisa hubungi email: <span class="highlight-pink">sodron.xoon@gmail.com</span>';
+        // ============ DATA GAME ============
+        const ALL_GAMES = [
+            { n:"Racing Car", img:"https://i.ibb.co.com/0jVVsPpK/image-291941ed.png", u:"https://d1wtralw2m821s.cloudfront.net/games/index.html?game_name=speed_racing&", moneyjar: true },
+            { n:"Mahjong Ways", img:"https://i.ibb.co.com/xSX4Gshj/image-c3be9824.png", u:"https://api-sg.yomi1413.com/balance/game/zzaa/302057/2/55?" },
+            { n:"Yummy Slots", img:"https://i.ibb.co.com/93YBy8dD/image-6f232e98.png", u:"https://d1wtralw2m821s.cloudfront.net/games/index.html?mode=games&game_name=yammy_slots&", moneyjar: true },
+            { n:"World Goal", img:"https://i.ibb.co.com/pBY0QpB4/image-26e69896.png", u:"https://api-sg-v2.yomi1413.com/gate/gateway/zzaaym/284?isHalf=false&heightRatio=1&gameMaker=2" },
+            { n:"Greedy Lion II", img:"https://i.ibb.co.com/452fkdb/image-c721045.png", u:"https://www.duolefast.com/common-web/full/game853/1.1.3/web-mobile/index.html?bizAppId=100049&gameid=1200012&engameid=853&isHalf=false&heightRatio=1&gameMaker=2" },
+            { n:"Jammin Jars", img:"https://i.ibb.co.com/cK1Jvw07/image-9cd6d73d.png", u:"https://www.duolefast.com/common-web/full/game1016/1.0.1/web-mobile/index.html?bizAppId=100049&gameid=1200010&engameid=1016&" },
+            { n:"Gold Tree", img:"https://i.ibb.co.com/Qv03qzgK/image-876895c5.png", u:"https://api-sg-v2.yomi1413.com/gate/gateway/zzaaym/561?isHalf=false&heightRatio=1&gameMaker=2" },
+            { n:"Futebol Fever", img:"https://i.ibb.co.com/kgSKDd1x/image-1a47e78.png", u:"https://www.duolefast.com/common-web/vert/game1028/1.0.2/web-mobile/index.html?bizAppId=100049&gameid=1200009&engameid=1028&heightRatio=0.7&" },
+            { n:"Major Bass", img:"https://i.ibb.co.com/b5DsSk96/image-47eb5477.png", u:"https://api-sg-v2.yomi1413.com/gate/gateway/zzaaym/562?isHalf=false&heightRatio=1&gameMaker=2" },
+            { n:"Super Ace", img:"https://i.ibb.co.com/S43wwsc1/image-3096ca0.png", u:"https://www.duolefast.com/common-web/full/game1015/1.1.3/web-mobile/index.html?bizAppId=100049&gameid=1200013&engameid=1015&isHalf=false&heightRatio=1&gameMaker=2" },
+            { n:"Gates Of Hades", img:"https://i.ibb.co.com/Pvxg0wHj/image-76501474.png", u:"https://www.duolefast.com/common-web/full/game1029/1.1.3/web-mobile/index.html?bizAppId=100049&gameid=1200014&engameid=1029&isHalf=false&heightRatio=1&gameMaker=2" },
+            { n:"Bandito", img:"https://i.ibb.co.com/4nyzcVkH/image-78c04432.png", u:"https://www.duolefast.com/common-web/full/game1026/1.0.2/web-mobile/index.html?bizAppId=100049&gameid=1200008&engameid=1026&" },
+            { n:"Fortune Pot", img:"https://i.ibb.co.com/F48MCD5b/image-c442ea28.png", u:"https://api-sg-v2.yomi1413.com/gate/gateway/zzaaym/560?isHalf=false&heightRatio=1&gameMaker=2" },
+            { n:"Crazy Treasure", img:"https://i.ibb.co.com/svCsCCyt/image-89696056.png", u:"https://api-sg-v2.yomi1413.com/gate/gateway/zzaaym/559?isHalf=false&heightRatio=1&gameMaker=2" },
+            { n:"Lucky Gem", img:"https://i.ibb.co.com/cSzPymHW/image-af0c016a.png", u:"https://d1wtralw2m821s.cloudfront.net/games/index.html?game_name=fortune_gems&", moneyjar: true },
+            { n:"Poker Ace", img:"https://i.ibb.co.com/TqYmvxjm/image-6095cb4d.png", u:"https://api-sg.yomi1413.com/balance/game/zzaa/302057/2/52?" },
+            { n:"Golden Tree", img:"https://i.ibb.co.com/JfJHT9T/image-25ae0677.png", u:"https://api.osgametheme.com/plug_new/theme37/xoon_full?", moneyjar: true },
+            { n:"Olympus II", img:"https://i.ibb.co.com/jZ3KpQf0/image-9439adea.png", u:"https://api-sg.yomi1413.com/balance/game/zzaa/302057/2/27?" },
+            { n:"MegaJackpot", img:"https://i.ibb.co.com/99ss7rWM/image-1c20034.png", u:"https://api-sg.yomi1413.com/balance/game/zzaa/302057/2/62?" },
+            { n:"Mahjong Ways II", img:"https://i.ibb.co.com/b58gmwKX/image-8cbe9cc0.png", u:"https://www.duolefast.com/common-web/full/game1009/1.0.4/web-mobile/index.html?bizAppId=100049&gameid=1200006&engameid=1009&" },
+            { n:"Lucky 777", img:"https://i.ibb.co.com/ccN427rz/image-844094.png", u:"https://d1wtralw2m821s.cloudfront.net/games/lucky777/index.html?" },
+            { n:"CrazyGems", img:"https://i.ibb.co.com/QvJ098ct/image-5b088966.png", u:"https://api-sg.yomi1413.com/balance/game/zzaa/302057/2/43?" },
+            { n:"Monkey King I", img:"https://i.ibb.co.com/GYFL4sG/image-daf45e7f.png", u:"https://d1wtralw2m821s.cloudfront.net/games/monkeyking/index.html?pl=xoon&v=11&mode=games&game_name=monkeyking&isHalf=false&heightRatio=1&gameMaker=2&game_id=128" },
+            { n:"Treasure", img:"https://i.ibb.co.com/WWGsqCRm/image-a3e85944.png", u:"https://d1wtralw2m821s.cloudfront.net/games/index.html?game_name=deep_sea_treasures&", moneyjar: true },
+            { n:"Monkey King II", img:"https://i.ibb.co.com/5hmGg12W/image-201fbf0f.png", u:"https://www.duolefast.com/common-web/full/game1014/1.0.4/web-mobile/index.html?bizAppId=100049&gameid=1200007&engameid=1014&isHalf=false&heightRatio=1&gameMaker=2" },
+            { n:"Wealthy Tiger", img:"https://i.ibb.co.com/60dY6bHK/image-9169f717.png", u:"https://api-sg.yomi1413.com/balance/game/zzaa/302057/2/60?" },
+            { n:"LuckyPig", img:"https://i.ibb.co.com/HTGTWtns/image-86adbd02.png", u:"https://www.duolefast.com/common-web/full/game1017/1.0.2/web-mobile/index.html?bizAppId=100049&gameid=1200002&engameid=1017&" },
+            { n:"Showdown", img:"https://i.ibb.co.com/FqYRw3p0/image-748da0e4.png", u:"https://www.duolefast.com/common-web/full/game1024/1.0.2/web-mobile/index.html?bizAppId=100049&gameid=1200003&engameid=1024&" },
+            { n:"Aztec", img:"https://i.ibb.co.com/MyLSy6qz/image-e53a217c.png", u:"https://www.duolefast.com/common-web/full/game1006/1.0.2/web-mobile/index.html?bizAppId=100049&gameid=1200001&engameid=1006&" },
+            { n:"Pirate King 2", img:"https://i.ibb.co.com/fZqbjvP/image-fc213f52.png", u:"https://d1wtralw2m821s.cloudfront.net/games/pirate_king/index.html?pl=xoon&v=11&isHalf=false&game_id=136&" },
+            { n:"King Of Olympus", img:"https://i.ibb.co.com/8nDVwzmx/image-adbf1924.png", u:"https://cdn-xoon.leadercc.com/games/gatesOfOlympus/index.html?" },
+            { n:"Mr Rich", img:"https://i.ibb.co.com/PshtqbWD/image-f646294c.png", u:"https://d1wtralw2m821s.cloudfront.net/games/mrrich/index.html?pl=xoon&v=11&mode=games&game_name=mrrich&isHalf=false&game_id=129&" },
+            { n:"King Of Olympus II", img:"https://i.ibb.co.com/SXJJ748s/image-5a904193.png", u:"https://www.duolefast.com/common-web/full/game1000/1.0.2/web-mobile/index.html?bizAppId=100049&gameid=1200005&engameid=1000&isHalf=false&heightRatio=1&gameMaker=2" },
+            { n:"Sweet Bonanza", img:"https://i.ibb.co.com/kv9CP9k/image-2149c8f.png", u:"https://d1wtralw2m821s.cloudfront.net/games/sweet_feast/index.html?mode=games&game_name=sweet_feast&isHalf=false&game_id=106", moneyjar: true },
+            { n:"Mahjong II", img:"https://i.ibb.co.com/GQp31hwC/image-2071d400.png", u:"https://api.osgametheme.com/plug_new/theme7/xoon_full?isHalf=false&heightRatio=1&gameMaker=2", moneyjar: true },
+            { n:"Book Of Death", img:"https://i.ibb.co.com/kzfyCKk/image-ca21281f.png", u:"https://api-sg.yomi1413.com/balance/game/zzaa/302057/2/63?" },
+            { n:"Deep Sea", img:"https://i.ibb.co.com/Qvh455Zx/image-f5af3b5a.png", u:"https://d1wtralw2m821s.cloudfront.net/games/index.html?game_name=deep_sea_fish&" },
+            { n:"Original 777", img:"https://i.ibb.co.com/QFYgB2Wd/image-46f6aacb.png", u:"https://api-sg.yomi1413.com/balance/game/zzaa/302057/2/57?" },
+            { n:"Gold Miner", img:"https://i.ibb.co.com/v4HfF5Y9/image-3d71e7f3.png", u:"https://api-sg.yomi1413.com/balance/game/zzaa/302057/2/53?" },
+            { n:"Fishing I", img:"https://i.ibb.co.com/hSmDTJQ/image-2ee7d78b.png", u:"https://d1wtralw2m821s.cloudfront.net/games/fish6/index.html?mode=games&game_name=fish6&isHalf=false&game_id=104&", moneyjar: true },
+            { n:"Fruit Flash", img:"https://i.ibb.co.com/fGSqdbLn/image-42557977.png", u:"https://api-sg.yomi1413.com/balance/game/zzaa/302057/2/35?" },
+            { n:"Lucky Slot", img:"https://i.ibb.co.com/Q7VwwgVB/image-4596ad14.png", u:"https://d1wtralw2m821s.cloudfront.net/games/index.html?game_name=luckyslots&" },
+            { n:"Sweet Sugar", img:"https://i.ibb.co.com/1GWWGGVj/image-f55e69e0.png", u:"https://api-sg.yomi1413.com/balance/game/zzaa/302057/2/41?" },
+            { n:"Greedy Monkey", img:"https://i.ibb.co.com/hFrqjVym/image-1a720f12.png", u:"https://d1wtralw2m821s.cloudfront.net/games/monkey_wheel/index.html?" },
+            { n:"Emperor", img:"https://i.ibb.co.com/Jw4ZtC07/image-eea8fc8c.png", u:"https://api-sg.yomi1413.com/balance/game/zzaa/302057/2/48?" },
+            { n:"GradyKing", img:"https://i.ibb.co.com/Q70MPxms/image-e9fc13ca.png", u:"https://www.duolefast.com/common-web/full/game845/" },
+            { n:"Big Hammer", img:"https://i.ibb.co.com/VWK2Py3f/image-35f096ca.png", u:"https://cdn-xoon.leadercc.com/games/big_hammer/", moneyjar: true },
+            { n:"Fishing II", img:"https://i.ibb.co.com/gL76WH2F/image-4687926a.png", u:"https://api-sg-v2.yomi1413.com/gate/gateway/zzaaym/128?" }
+        ];
 
-        const typedContent = document.getElementById('typedContent');
-        let charIndex = 0;
-        let typingStarted = false;
+        // ============ DATA PLAYLIST ============
+        const PLAYLIST = [
+            { id: 1, name: "Anjay Dapat Scatter", artist: "SodroN Xoon", url: "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A2368110281&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true" },
+            { id: 2, name: "Lagu Malaysia Slow Rock", artist: "Muhammad Perwira", url: "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A1295601844&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true" },
+            { id: 3, name: "Iwan Fals Nostalgia", artist: "Jimmy Adhi Putra", url: "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A1877740326&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true" },
+            { id: 4, name: "DEWA 19 feat VIRZA", artist: "scO_Ots", url: "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A1268629780&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true" },
+            { id: 5, name: "Bondan Prakoso ft Fade 2 Black", artist: "Suprimhmdd", url: "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A801776089&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true" },
+            { id: 6, name: "Ebiet G Ade Full Album", artist: "MAZKUR., SKM", url: "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A2054745172&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true" },
+            { id: 7, name: "Rhoma Irama Qur'an Dan Koran", artist: "Fatoni Toni", url: "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A2126290731&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true" },
+            { id: 8, name: "Tasya Rosmala Full Album", artist: "🇷‌🇮‌🇿‌🇦‌🇱‌🇱‌", url: "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A1810230603&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true" },
+            { id: 9, name: "Nike Ardila Full Album", artist: "Ahmad Hanafi", url: "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A597850593&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true" },
+            { id: 10, name: "Revo Ramon Full Album", artist: "Campuran Lagu Indonesia", url: "https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A1400266267&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true" }
+        ];
 
-        function typeWriter() {
-            if (charIndex < text.length) {
-                const char = text.charAt(charIndex);
-                if (char === '<') {
-                    const endTag = text.indexOf('>', charIndex);
-                    typedContent.innerHTML += text.substring(charIndex, endTag + 1);
-                    charIndex = endTag + 1;
-                } else {
-                    typedContent.innerHTML += char;
-                    charIndex++;
-                }
-                setTimeout(typeWriter, 20 + Math.random() * 15);
+        // ============ MUSIK PLAYER ============
+        let currentSongIndex = 0;
+        let isPlaying = false;
+        let isShuffle = false;
+        let isRepeat = false;
+        let widget = null;
+        let widgetReady = false;
+
+        function updatePlayButton() {
+            const btn = document.getElementById('btnPlay');
+            if (isPlaying) {
+                btn.textContent = '⏸';
+                btn.classList.add('playing');
+                document.getElementById('musikCover').classList.add('playing');
             } else {
-                document.querySelector('.cursor-blink').style.display = 'none';
+                btn.textContent = '▶';
+                btn.classList.remove('playing');
+                document.getElementById('musikCover').classList.remove('playing');
             }
         }
 
-        function startTyping() {
-            if (typingStarted) return;
-            typingStarted = true;
-            typedContent.innerHTML = '';
-            charIndex = 0;
-            setTimeout(typeWriter, 400);
-        }
+        function loadSong(index) {
+            const song = PLAYLIST[index];
+            if (!song) return;
 
-        // ============================================================
-        // 2. AUDIO ENGINE
-        // ============================================================
-        const audio = document.getElementById('audioPlayer');
-        let audioCtx = null;
-        let analyser = null;
-        let dataArray = null;
-        let isAudioReady = false;
+            currentSongIndex = index;
 
-        function initAudio() {
-            if (isAudioReady) return;
+            document.getElementById('songTitle').textContent = song.name;
+            document.getElementById('songArtist').textContent = song.artist;
+            document.getElementById('nowPlayingName').textContent = song.name;
 
-            try {
-                audioCtx = new(window.AudioContext || window.webkitAudioContext)();
-                analyser = audioCtx.createAnalyser();
-                analyser.fftSize = 256;
-
-                const source = audioCtx.createMediaElementSource(audio);
-                source.connect(analyser);
-                analyser.connect(audioCtx.destination);
-
-                dataArray = new Uint8Array(analyser.frequencyBinCount);
-                isAudioReady = true;
-
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
-                audio.play().catch(() => {});
-            } catch (e) {
-                console.warn('Audio init error:', e);
-            }
-        }
-
-        // Klik di mana saja untuk mulai audio
-        document.addEventListener('click', function firstClick() {
-            initAudio();
-            document.removeEventListener('click', firstClick);
-        });
-
-        // ============================================================
-        // 3. CANVAS VISUALIZER
-        // ============================================================
-        const canvas = document.getElementById('visualizerCanvas');
-        const ctx = canvas.getContext('2d');
-        let W, H;
-
-        function resize() {
-            W = canvas.width = window.innerWidth;
-            H = canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resize);
-        resize();
-
-        const eqBars = document.querySelectorAll('.equalizer .bar');
-
-        function updateEqualizer(level) {
-            const scaled = Math.min(level / 128, 1);
-            eqBars.forEach((bar, i) => {
-                const h = 3 + (scaled * 16) * (0.4 + Math.random() * 0.6);
-                bar.style.height = h + 'px';
+            document.querySelectorAll('.playlist-item').forEach((el, i) => {
+                el.classList.toggle('active', i === index);
+                el.classList.toggle('playing', i === index && isPlaying);
             });
-        }
 
-        let hueOffset = 0;
+            const cover = document.getElementById('musikCover');
+            const colors = [
+                ['#f39c12', '#e74c3c'],
+                ['#3498db', '#2ecc71'],
+                ['#9b59b6', '#e74c3c'],
+                ['#1abc9c', '#2ecc71'],
+                ['#e67e22', '#f39c12'],
+                ['#8e44ad', '#3498db'],
+                ['#2c3e50', '#e74c3c'],
+                ['#16a085', '#f39c12'],
+                ['#c0392b', '#e67e22'],
+                ['#2980b9', '#9b59b6']
+            ];
+            const c = colors[index % colors.length];
+            cover.style.background = `linear-gradient(135deg, ${c[0]}, ${c[1]})`;
 
-        function draw() {
-            requestAnimationFrame(draw);
+            widgetReady = false;
+            const iframe = document.getElementById('musikFrame');
+            
+            if (song.url) {
+                iframe.src = song.url;
+                
+                iframe.onload = function() {
+                    setTimeout(function() {
+                        if (typeof SC !== 'undefined' && SC.Widget) {
+                            widget = null;
+                            widget = SC.Widget(iframe);
+                            
+                            widget.bind(SC.Widget.Events.READY, function() {
+                                widgetReady = true;
+                                console.log('🎵 Widget Ready: ' + song.name);
+                                if (isPlaying) {
+                                    widget.play();
+                                }
+                            });
+                            
+                            widget.bind(SC.Widget.Events.PLAY, function() {
+                                isPlaying = true;
+                                updatePlayButton();
+                                document.querySelectorAll('.playlist-item').forEach((el, i) => {
+                                    el.classList.toggle('playing', i === currentSongIndex);
+                                });
+                            });
 
-            let avg = 0;
-            if (analyser && dataArray) {
-                analyser.getByteFrequencyData(dataArray);
-                let sum = 0;
-                for (let i = 0; i < dataArray.length; i++) {
-                    sum += dataArray[i];
-                }
-                avg = sum / dataArray.length;
-                updateEqualizer(avg);
-                hueOffset += 0.15;
-            }
+                            widget.bind(SC.Widget.Events.PAUSE, function() {
+                                isPlaying = false;
+                                updatePlayButton();
+                                document.querySelectorAll('.playlist-item').forEach(el => el.classList.remove('playing'));
+                            });
 
-            ctx.clearRect(0, 0, W, H);
+                            widget.bind(SC.Widget.Events.FINISH, function() {
+                                if (isRepeat) {
+                                    widget.play();
+                                } else {
+                                    nextSong();
+                                }
+                            });
 
-            const grad = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, W * 0.7);
-            const alpha = 0.02 + (avg / 255) * 0.04;
-            grad.addColorStop(0, `rgba(0, 240, 255, ${alpha})`);
-            grad.addColorStop(0.5, `rgba(255, 45, 120, ${alpha * 0.5})`);
-            grad.addColorStop(1, `rgba(5, 8, 12, 1)`);
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, W, H);
-
-            if (analyser && dataArray) {
-                const bars = 80;
-                const barWidth = W / bars;
-                const spacing = 2;
-                const width = barWidth - spacing;
-
-                for (let i = 0; i < bars; i++) {
-                    const idx = Math.floor((i / bars) * dataArray.length);
-                    const value = dataArray[idx] || 0;
-                    const percent = value / 255;
-                    const height = percent * H * 0.35;
-
-                    const x = i * barWidth;
-                    const y = H / 2 - height / 2;
-
-                    const hue = (i / bars) * 200 + 200 + Math.sin(hueOffset + i * 0.05) * 20;
-                    const lightness = 50 + percent * 30;
-
-                    ctx.fillStyle = `hsl(${hue}, 90%, ${lightness}%)`;
-                    ctx.shadowColor = `hsl(${hue}, 90%, 60%)`;
-                    ctx.shadowBlur = 10 + percent * 20;
-                    ctx.fillRect(x + spacing / 2, y, width, Math.max(height, 2));
-                }
-
-                ctx.shadowBlur = 0;
-
-                const centerX = W / 2;
-                const centerY = H / 2 + 20;
-                const radius = Math.min(W, H) * 0.18 + (avg / 255) * 40;
-
-                for (let ring = 0; ring < 3; ring++) {
-                    const r = radius + ring * 25 + (avg / 255) * 15;
-                    ctx.beginPath();
-                    ctx.arc(centerX, centerY, r, 0, Math.PI * 2);
-                    ctx.strokeStyle = `hsla(${200 + ring * 30 + hueOffset}, 90%, 70%, ${0.08 + (avg / 255) * 0.15})`;
-                    ctx.lineWidth = 1.5;
-                    ctx.stroke();
-                }
-
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, 5 + (avg / 255) * 25, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(0, 240, 255, ${0.1 + (avg / 255) * 0.3})`;
-                ctx.shadowColor = '#00f0ff';
-                ctx.shadowBlur = 30 + (avg / 255) * 60;
-                ctx.fill();
-                ctx.shadowBlur = 0;
-            }
-
-            if (Math.random() < 0.01) {
-                const y = Math.random() * H;
-                const h = 2 + Math.random() * 8;
-                ctx.fillStyle = `rgba(0, 240, 255, ${0.03 + Math.random() * 0.05})`;
-                ctx.fillRect(0, y, W, h);
-            }
-            if (Math.random() < 0.008) {
-                const y = Math.random() * H;
-                const h = 2 + Math.random() * 6;
-                ctx.fillStyle = `rgba(255, 45, 120, ${0.03 + Math.random() * 0.04})`;
-                ctx.fillRect(0, y, W, h);
+                            widget.bind(SC.Widget.Events.ERROR, function(e) {
+                                console.log('⚠️ SoundCloud error:', e);
+                            });
+                        } else {
+                            loadSoundCloudAPI();
+                        }
+                    }, 500);
+                };
             }
         }
 
-        draw();
+        function togglePlay() {
+            if (!widget || !widgetReady) {
+                const song = PLAYLIST[currentSongIndex];
+                const iframe = document.getElementById('musikFrame');
+                if (song.url) {
+                    iframe.src = song.url;
+                    loadSoundCloudAPI();
+                }
+                return;
+            }
 
-        // ============================================================
-        // 4. FRAME FUNCTIONS
-        // ============================================================
-        const frame = document.getElementById('frame');
-        const backdrop = document.getElementById('backdrop');
-        const scene = document.getElementById('scene');
+            if (isPlaying) {
+                widget.pause();
+            } else {
+                widget.play();
+            }
+        }
+
+        function nextSong() {
+            let next = currentSongIndex + 1;
+            if (next >= PLAYLIST.length) {
+                if (isRepeat) {
+                    next = 0;
+                } else {
+                    return;
+                }
+            }
+            if (isShuffle) {
+                let tries = 0;
+                do {
+                    next = Math.floor(Math.random() * PLAYLIST.length);
+                    tries++;
+                } while (next === currentSongIndex && tries < 20 && PLAYLIST.length > 1);
+            }
+            isPlaying = true;
+            loadSong(next);
+            setTimeout(function() {
+                if (widget && widgetReady) {
+                    widget.play();
+                }
+            }, 600);
+            showToast(`▶ ${PLAYLIST[next].name}`);
+        }
+
+        function prevSong() {
+            let prev = currentSongIndex - 1;
+            if (prev < 0) {
+                if (isRepeat) {
+                    prev = PLAYLIST.length - 1;
+                } else {
+                    return;
+                }
+            }
+            if (isShuffle) {
+                let tries = 0;
+                do {
+                    prev = Math.floor(Math.random() * PLAYLIST.length);
+                    tries++;
+                } while (prev === currentSongIndex && tries < 20 && PLAYLIST.length > 1);
+            }
+            isPlaying = true;
+            loadSong(prev);
+            setTimeout(function() {
+                if (widget && widgetReady) {
+                    widget.play();
+                }
+            }, 600);
+            showToast(`▶ ${PLAYLIST[prev].name}`);
+        }
+
+        function toggleShuffle() {
+            isShuffle = !isShuffle;
+            document.getElementById('btnShuffle').classList.toggle('active', isShuffle);
+            showToast(isShuffle ? '🔀 Shuffle ON' : '🔀 Shuffle OFF');
+        }
+
+        function toggleRepeat() {
+            isRepeat = !isRepeat;
+            document.getElementById('btnRepeat').classList.toggle('active', isRepeat);
+            showToast(isRepeat ? '🔁 Repeat ON' : '🔁 Repeat OFF');
+        }
+
+        // ============ RENDER PLAYLIST ============
+        function renderPlaylist() {
+            const container = document.getElementById('musikPlaylist');
+            if (!container) return;
+            const title = container.querySelector('.playlist-title');
+            container.innerHTML = '';
+            container.appendChild(title);
+
+            for (let i = 0; i < PLAYLIST.length; i++) {
+                const song = PLAYLIST[i];
+                const item = document.createElement('div');
+                item.className = 'playlist-item';
+                if (i === currentSongIndex) {
+                    item.classList.add('active');
+                    if (isPlaying) item.classList.add('playing');
+                }
+
+                item.innerHTML = `
+                    <span class="song-number">${String(i + 1).padStart(2, '0')}</span>
+                    <div class="song-info">
+                        <div class="song-name">${song.name}</div>
+                        <div class="song-artist">${song.artist}</div>
+                    </div>
+                    <span class="play-icon">${i === currentSongIndex && isPlaying ? '▶' : '♪'}</span>
+                `;
+
+                item.onclick = function() {
+                    isPlaying = true;
+                    loadSong(i);
+                    setTimeout(function() {
+                        if (widget && widgetReady) {
+                            widget.play();
+                        }
+                    }, 600);
+                    showToast(`▶ ${song.name}`);
+                };
+
+                container.appendChild(item);
+            }
+        }
+
+        // ============ LOAD SOUNDCLOUD API ============
+        function loadSoundCloudAPI() {
+            if (document.querySelector('script[src*="soundcloud.com/api.js"]')) {
+                setTimeout(function() {
+                    if (typeof SC !== 'undefined' && SC.Widget) {
+                        const iframe = document.getElementById('musikFrame');
+                        widget = SC.Widget(iframe);
+                        widget.bind(SC.Widget.Events.READY, function() {
+                            widgetReady = true;
+                            if (isPlaying) widget.play();
+                        });
+                    }
+                }, 300);
+                return;
+            }
+            
+            const script = document.createElement('script');
+            script.src = 'https://w.soundcloud.com/player/api.js';
+            script.onload = function() {
+                console.log('🎵 SoundCloud API Loaded');
+                const iframe = document.getElementById('musikFrame');
+                if (iframe.src) {
+                    setTimeout(function() {
+                        widget = SC.Widget(iframe);
+                        widget.bind(SC.Widget.Events.READY, function() {
+                            widgetReady = true;
+                            if (isPlaying) widget.play();
+                        });
+                    }, 500);
+                }
+            };
+            document.head.appendChild(script);
+        }
+
+        // ============ KONFIGURASI AKUN ============
+        let ACCOUNT = {
+            uid: '1756457056973000156',
+            token: 'update-MyToken',
+            nickname: 'SodroN',
+            avatar: 'https://i.ibb.co.com/F4zMvW25/20260712-173425.jpg'
+        };
+
+        function loadAccount() {
+            let saved = localStorage.getItem('account_SodroN');
+            if (saved) {
+                try {
+                    let parsed = JSON.parse(saved);
+                    ACCOUNT = parsed;
+                } catch(e) {}
+            }
+            updateProfileDisplay();
+        }
+
+        function saveAccount() {
+            localStorage.setItem('account_SodroN', JSON.stringify(ACCOUNT));
+        }
+
+        function updateProfileDisplay() {
+            document.getElementById('profileAvatar').src = ACCOUNT.avatar;
+            document.getElementById('profileNickname').textContent = ACCOUNT.nickname;
+            document.getElementById('editToken').value = ACCOUNT.token;
+        }
+
+        function saveToken() {
+            let token = document.getElementById('editToken').value.trim();
+            if (!token) {
+                document.getElementById('tokenStatus').textContent = '❌ Token tidak boleh kosong!';
+                document.getElementById('tokenStatus').style.color = '#e74c3c';
+                return;
+            }
+            ACCOUNT.token = token;
+            saveAccount();
+            document.getElementById('tokenStatus').textContent = '✅ Token berhasil disimpan!';
+            document.getElementById('tokenStatus').style.color = '#2ecc71';
+            setTimeout(() => {
+                document.getElementById('tokenStatus').textContent = 'Token tersimpan di browser';
+                document.getElementById('tokenStatus').style.color = 'rgba(255,255,255,0.5)';
+            }, 3000);
+        }
+
+        function getAuthString() {
+            return `uid=${ACCOUNT.uid}&token=${ACCOUNT.token}&nickname=${ACCOUNT.nickname}&avatar=${encodeURIComponent(ACCOUNT.avatar)}`;
+        }
+
+        // ============ RENDER GAME GRID ============
+        function renderGameGrid(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = '';
+
+            for (let game of ALL_GAMES) {
+                let card = document.createElement('div');
+                card.className = 'game-card';
+                let stickerHtml = game.moneyjar ? `<div class="moneyjar-sticker">💰Money Jar</div>` : '';
+                card.innerHTML = `
+                    <div class="game-img">
+                        ${stickerHtml}
+                        <img src="${game.img}" onerror="this.src='https://via.placeholder.com/70?text=No'">
+                    </div>
+                    <div class="game-name">${game.n}</div>
+                `;
+                card.onclick = function() {
+                    openGameInPage(game);
+                };
+                container.appendChild(card);
+            }
+        }
+
+        // ============ RENDER SIDEBAR GAME ============
+        function renderGameSidebar(activeGame) {
+            const sidebar = document.getElementById('gamePlaySidebar');
+            if (!sidebar) return;
+
+            sidebar.innerHTML = '';
+
+            for (let game of ALL_GAMES) {
+                const item = document.createElement('div');
+                item.className = 'sidebar-game-item';
+                if (activeGame && activeGame.n === game.n) {
+                    item.classList.add('active');
+                }
+
+                item.innerHTML = `
+                    <img class="side-img" src="${game.img}" onerror="this.src='https://via.placeholder.com/55?text=No'">
+                    <div class="side-name">${game.n}</div>
+                `;
+
+                item.onclick = function() {
+                    openGameInPage(game);
+                };
+
+                sidebar.appendChild(item);
+            }
+        }
+
+        // ============ OPEN GAME ============
         const gameFrame = document.getElementById('gameFrame');
+        const gamePlayContainer = document.getElementById('gamePlayContainer');
+        const gameGrid = document.getElementById('gameGridGames');
+        const gameFrameTitle = document.getElementById('gameFrameTitle');
+        const gameFrameLoading = document.getElementById('gameFrameLoading');
 
-        // OPEN - tampilkan scene dengan typing effect
-        window.openFrame = function(e) {
-            if (e) e.stopPropagation();
+        function scrollToGame() {
+            setTimeout(() => {
+                const container = document.getElementById('gamePlayContainer');
+                if (container) {
+                    container.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start',
+                        inline: 'nearest'
+                    });
+                }
+            }, 500);
+        }
 
-            // Sembunyikan game jika terbuka
-            gameFrame.style.display = 'none';
-            gameFrame.src = '';
-            scene.style.display = 'flex';
+        function openGameInPage(game) {
+            let sep = game.u.includes('?') ? '&' : '?';
+            let authStr = getAuthString();
+            let url = game.u + sep + authStr + '&lang=en';
 
-            // Reset & mulai typing
-            typingStarted = false;
-            typedContent.innerHTML = '';
-            document.querySelector('.cursor-blink').style.display = 'inline-block';
-            startTyping();
+            gameGrid.classList.add('hidden');
+            gamePlayContainer.classList.add('active');
+            renderGameSidebar(game);
 
-            frame.classList.add('active');
-            backdrop.classList.add('active');
+            gameFrameTitle.textContent = game.n;
+            gameFrameLoading.classList.remove('hidden');
 
-            // Pastikan audio jalan
-            if (!isAudioReady) initAudio();
-            if (audio.paused) audio.play().catch(() => {});
-        };
+            gameFrame.src = 'about:blank';
+            setTimeout(() => {
+                gameFrame.src = url;
+            }, 100);
 
-        // GAMES - musik BERHENTI
-        window.openGame = function(e) {
-            if (e) e.stopPropagation();
+            gameFrame.onload = function() {
+                gameFrameLoading.classList.add('hidden');
+            };
 
-            // HENTIKAN musik
-            audio.pause();
-            audio.currentTime = 0;
+            setTimeout(() => {
+                gameFrameLoading.classList.add('hidden');
+            }, 8000);
 
-            scene.style.display = 'none';
-            gameFrame.style.display = 'block';
-            gameFrame.src = 'https://xexmxsdrnx.github.io';
-            frame.classList.add('active');
-            backdrop.classList.add('active');
-        };
+            scrollToGame();
+        }
 
-        // CLOSE - musik lanjut lagi
-        window.closeFrame = function() {
-            frame.classList.remove('active');
-            backdrop.classList.remove('active');
-            gameFrame.src = '';
-            gameFrame.style.display = 'none';
-            scene.style.display = 'flex';
+        function closeGameFrame() {
+            gamePlayContainer.classList.remove('active');
+            gameFrame.src = 'about:blank';
+            gameGrid.classList.remove('hidden');
+        }
 
-            if (!isAudioReady) initAudio();
-            if (audio.paused) audio.play().catch(() => {});
-        };
+        // ============ OPEN XOON.LIVE ============
+        function openXoon() {
+            gameGrid.classList.add('hidden');
+            gamePlayContainer.classList.add('active');
+            renderGameSidebar(null);
 
-        backdrop.addEventListener('click', window.closeFrame);
+            gameFrameTitle.textContent = 'Xoon.live';
+            gameFrameLoading.classList.remove('hidden');
+
+            gameFrame.src = 'about:blank';
+            setTimeout(() => {
+                gameFrame.src = 'https://xoon.live';
+            }, 100);
+
+            gameFrame.onload = function() {
+                gameFrameLoading.classList.add('hidden');
+            };
+
+            setTimeout(() => {
+                gameFrameLoading.classList.add('hidden');
+            }, 8000);
+
+            if (currentTab !== 'games') {
+                switchTab('games');
+            }
+
+            scrollToGame();
+        }
+
+        // ============ TOAST ============
+        function showToast(msg) {
+            let t = document.createElement('div');
+            t.className = 'toast-notif';
+            t.innerHTML = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 2500);
+        }
+
+        // ============ SWITCH TAB ============
+        let currentTab = 'musik';
+
+        function switchTab(tab) {
+            currentTab = tab;
+
+            document.querySelectorAll('.desktop-tabs .tab-btn').forEach(el => {
+                el.classList.remove('active');
+                if (el.dataset.tab === tab) el.classList.add('active');
+            });
+
+            document.querySelectorAll('.mobile-bottom-nav .nav-item').forEach(el => {
+                el.classList.remove('active');
+                if (el.dataset.tab === tab) el.classList.add('active');
+            });
+
+            document.querySelectorAll('.page-content').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            let targetPage = document.getElementById('page-' + tab);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+
+            if (tab !== 'games') {
+                closeGameFrame();
+            }
+        }
+
+        // ============ KEYBOARD SHORTCUT ============
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') window.closeFrame();
+            if (e.key === 'Escape') {
+                closeGameFrame();
+            }
+            if (e.key === ' ' || e.key === 'Space') {
+                e.preventDefault();
+                togglePlay();
+            }
+            if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                nextSong();
+            }
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSong();
+            }
         });
 
-        console.log('🎵 SODRON • XOON READY!');
-        console.log('💡 Klik di mana saja untuk mulai audio.');
-        console.log('📝 Klik OPEN → typing effect di popup');
-        console.log('🎮 Klik GAMES → musik berhenti & buka Xoon');
+        // ============ UPDATE ABOUT STATS ============
+        function updateAboutStats() {
+            document.getElementById('totalGames').textContent = ALL_GAMES.length;
+            document.getElementById('totalSongs').textContent = PLAYLIST.length;
+        }
+
+        // ============ INIT ============
+        loadAccount();
+        renderGameGrid('gameGridGames');
+        renderPlaylist();
+        updateAboutStats();
+
+        if (PLAYLIST[0]) {
+            loadSong(0);
+        }
+
+        loadSoundCloudAPI();
+
+        console.log('🚀 SodroN Loaded!');
+        console.log('📌 Total Games:', ALL_GAMES.length);
+        console.log('📌 Total Lagu:', PLAYLIST.length);
+        console.log('📌 Shortcut: Space (Play/Pause), Arrow Left/Right (Prev/Next)');
+        console.log('📌 Kredit: Semua game dari Xoon.live');
     </script>
+
 </body>
 </html>
